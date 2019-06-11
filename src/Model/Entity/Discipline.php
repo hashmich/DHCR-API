@@ -26,4 +26,8 @@ class Discipline extends Entity
         'name' => true,
         'courses' => true
     ];
+    
+    protected $_hidden = [
+    	'_joinData'
+	];
 }

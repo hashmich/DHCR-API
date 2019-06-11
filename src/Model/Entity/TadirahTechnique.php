@@ -30,4 +30,8 @@ class TadirahTechnique extends Entity
         'courses' => true,
         'tadirah_activities' => true
     ];
+	
+	protected $_hidden = [
+		'_joinData'
+	];
 }

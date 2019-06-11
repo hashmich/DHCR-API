@@ -24,7 +24,6 @@ class CoursesController extends AppController
     {
         $query = $this->Courses->find('all', array(
         	'contain' => [
-				'Users',
 				'DeletionReasons',
 				'Countries',
 				'Cities',
@@ -32,15 +31,17 @@ class CoursesController extends AppController
 				'CourseParentTypes',
 				'CourseTypes',
 				'Languages',
-				'CourseDurationUnits'
+				'CourseDurationUnits',
+				'Disciplines',
+				'TadirahTechniques',
+				'TadirahObjects'
 			],
 			'conditions' => [
-				'Courses.active' => true,
-				'Courses.deleted' => false
+				'Courses.active' => true
 			]
 		));
 	
-		$courses = $query->toArray();
+		$courses = $query->toList();
 		
 		$this->viewBuilder()->setClassName('Json');
 		if($this->request->is('xml'))

@@ -41,11 +41,17 @@ class Institution extends Entity
         'url' => true,
         'lon' => true,
         'lat' => true,
-        'created' => true,
-        'updated' => true,
+        'created' => false,
+        'updated' => false,
         'city' => true,
         'country' => true,
         'courses' => true,
         'users' => true
     ];
+    
+    protected $_hidden = [
+    	'lon',
+		'lat',
+		'users'
+	];
 }

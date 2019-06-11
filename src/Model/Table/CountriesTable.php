@@ -12,7 +12,6 @@ use Cake\Validation\Validator;
  * @property \App\Model\Table\CitiesTable|\Cake\ORM\Association\HasMany $Cities
  * @property \App\Model\Table\CoursesTable|\Cake\ORM\Association\HasMany $Courses
  * @property \App\Model\Table\InstitutionsTable|\Cake\ORM\Association\HasMany $Institutions
- * @property \App\Model\Table\UsersTable|\Cake\ORM\Association\HasMany $Users
  *
  * @method \App\Model\Entity\Country get($primaryKey, $options = [])
  * @method \App\Model\Entity\Country newEntity($data = null, array $options = [])
@@ -46,9 +45,6 @@ class CountriesTable extends Table
             'foreignKey' => 'country_id'
         ]);
         $this->hasMany('Institutions', [
-            'foreignKey' => 'country_id'
-        ]);
-        $this->hasMany('Users', [
             'foreignKey' => 'country_id'
         ]);
     }

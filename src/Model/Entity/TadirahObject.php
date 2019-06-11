@@ -28,4 +28,8 @@ class TadirahObject extends Entity
         'description' => true,
         'courses' => true
     ];
+	
+	protected $_hidden = [
+		'_joinData'
+	];
 }

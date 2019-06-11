@@ -36,4 +36,9 @@ class Country extends Entity
         'institutions' => true,
         'users' => true
     ];
+    
+    protected $_hidden = [
+    	'domain_name',
+		'stop_words'
+	];
 }
