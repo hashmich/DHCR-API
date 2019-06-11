@@ -19,10 +19,23 @@ class CoursesController extends AppController
      */
     
     
+    private $_allowedFilters = [
+    	'country_id',
+		'city_id',
+		'institution_id',
+		'language_id',
+		'course_type_id',
+		'course_parent_type_id',
+		'discipline_id',
+		'tadirah_object_id',
+		'tadirah_technique_id',
+		'recent'
+	];
+    
     
     public function index()
     {
-        $query = $this->Courses->find('all', array(
+     	$query = $this->Courses->find('all', array(
         	'contain' => [
 				'DeletionReasons',
 				'Countries',
@@ -36,9 +49,7 @@ class CoursesController extends AppController
 				'TadirahTechniques',
 				'TadirahObjects'
 			],
-			'conditions' => [
-				'Courses.active' => true
-			]
+			'conditions' => $this->_getFilter()
 		));
 	
 		$courses = $query->toList();
@@ -50,6 +61,38 @@ class CoursesController extends AppController
         $this->set(compact('courses'));
         $this->set('_serialize', 'courses');
     }
+    
+    private function _getFilter() {
+		$filter = $this->request->getQuery();
+		$conditions = ['Courses.active' => true];
+		foreach($filter as $key => $value) {
+			if(!in_array($key, $this->_allowedFilters)) {
+				unset($filter[$key]);
+				continue;
+			}
+			if(is_string($value) AND strpos($value, ',') !== false) {
+				$value = explode(',', $value);
+				$value = array_filter($value);	// remove empty elements & non-digits
+				$value = array_filter($value, function($v) { return ctype_digit($v) AND $v > 0; });
+			}
+			switch($key) {
+				case 'recent':
+					if($value = true) {
+						$conditions['Course.deleted'] = false;
+						$conditions['Course.updated >'] = date('Y-m-d H:i:s', time() - 60*60*24*489);
+					}
+					break;
+				case 'discipline_id':
+				case 'tadirah_object_id':
+				case 'tadirah_technique_id':
+					break;
+				default:
+					$conditions['Course.'.$key] = $value;
+			}
+		}
+		
+		return $conditions;
+	}
 
     /**
      * View method
