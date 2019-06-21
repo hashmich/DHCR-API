@@ -2,6 +2,9 @@
 namespace App\Controller;
 
 use App\Controller\AppController;
+use Cake\Datasource\Exception\RecordNotFoundException;
+use Cake\Event\Event;
+use http\Exception\BadHeaderException;
 
 /**
  * Courses Controller
@@ -29,38 +32,51 @@ class CoursesController extends AppController
 		'discipline_id',
 		'tadirah_object_id',
 		'tadirah_technique_id',
-		'recent'
+		'recent',
+		'start_date',
+		'end_date'
+	];
+    
+    private $_containments = [
+		'DeletionReasons',
+		'Countries',
+		'Cities',
+		'Institutions',
+		'CourseParentTypes',
+		'CourseTypes',
+		'Languages',
+		'CourseDurationUnits',
+		'Disciplines',
+		'TadirahTechniques',
+		'TadirahObjects'
 	];
     
     
-    public function index()
-    {
+    public function index() {
      	$query = $this->Courses->find('all', array(
-        	'contain' => [
-				'DeletionReasons',
-				'Countries',
-				'Cities',
-				'Institutions',
-				'CourseParentTypes',
-				'CourseTypes',
-				'Languages',
-				'CourseDurationUnits',
-				'Disciplines',
-				'TadirahTechniques',
-				'TadirahObjects'
-			],
-			'conditions' => $this->_getFilter()
+        	'contain' => $this->_containments,
+			'conditions' => $this->Courses->getFilter($this->request)
 		));
 	
 		$courses = $query->toList();
 		
-		$this->viewBuilder()->setClassName('Json');
-		if($this->request->is('xml'))
-			$this->viewBuilder()->setClassName('Xml');
-
-        $this->set(compact('courses'));
+		$this->set('courses', $courses);
         $this->set('_serialize', 'courses');
     }
+    
+    
+    public function count() {
+		$query = $this->Courses->find('all', array(
+			'contain' => $this->_containments,
+			'conditions' => $this->Courses->getFilter($this->request)
+		));
+		
+		$result = ['course_count' => $query->count()];
+		
+		$this->set('count', $result);
+		$this->set('_serialize', 'count');
+	}
+    
     
     private function _getFilter() {
 		$filter = $this->request->getQuery();
@@ -77,9 +93,9 @@ class CoursesController extends AppController
 			}
 			switch($key) {
 				case 'recent':
-					if($value = true) {
-						$conditions['Course.deleted'] = false;
-						$conditions['Course.updated >'] = date('Y-m-d H:i:s', time() - 60*60*24*489);
+					if($value == true || $value === '') {
+						$conditions['Courses.deleted'] = false;
+						$conditions['Courses.updated >'] = date('Y-m-d H:i:s', time() - 60*60*24*489);
 					}
 					break;
 				case 'discipline_id':
@@ -87,7 +103,7 @@ class CoursesController extends AppController
 				case 'tadirah_technique_id':
 					break;
 				default:
-					$conditions['Course.'.$key] = $value;
+					$conditions['Courses.'.$key] = $value;
 			}
 		}
 		
@@ -101,102 +117,22 @@ class CoursesController extends AppController
      * @return \Cake\Http\Response|void
      * @throws \Cake\Datasource\Exception\RecordNotFoundException When record not found.
      */
-    public function view($id = null)
-    {
+    public function view($id = null) {
         $course = $this->Courses->get($id, [
-            'contain' => ['Users', 'DeletionReasons', 'Countries', 'Cities', 'Institutions', 'CourseParentTypes', 'CourseTypes', 'Languages', 'CourseDurationUnits', 'Disciplines', 'TadirahActivities', 'TadirahObjects', 'TadirahTechniques']
-        ]);
-
+			'contain' => $this->_containments,
+			'conditions' => [
+				//'Courses.id' => $id,
+				'Courses.active' => true
+			]
+		]);
+        
+        if(empty($course)) {
+			throw new RecordNotFoundException();
+		}
+        
         $this->set('course', $course);
+		$this->set('_serialize', 'course');
     }
 
-    /**
-     * Add method
-     *
-     * @return \Cake\Http\Response|null Redirects on successful add, renders view otherwise.
-     */
-    public function add()
-    {
-        $course = $this->Courses->newEntity();
-        if ($this->request->is('post')) {
-            $course = $this->Courses->patchEntity($course, $this->request->getData());
-            if ($this->Courses->save($course)) {
-                $this->Flash->success(__('The course has been saved.'));
-
-                return $this->redirect(['action' => 'index']);
-            }
-            $this->Flash->error(__('The course could not be saved. Please, try again.'));
-        }
-        $users = $this->Courses->Users->find('list', ['limit' => 200]);
-        $deletionReasons = $this->Courses->DeletionReasons->find('list', ['limit' => 200]);
-        $countries = $this->Courses->Countries->find('list', ['limit' => 200]);
-        $cities = $this->Courses->Cities->find('list', ['limit' => 200]);
-        $institutions = $this->Courses->Institutions->find('list', ['limit' => 200]);
-        $courseParentTypes = $this->Courses->CourseParentTypes->find('list', ['limit' => 200]);
-        $courseTypes = $this->Courses->CourseTypes->find('list', ['limit' => 200]);
-        $languages = $this->Courses->Languages->find('list', ['limit' => 200]);
-        $courseDurationUnits = $this->Courses->CourseDurationUnits->find('list', ['limit' => 200]);
-        $disciplines = $this->Courses->Disciplines->find('list', ['limit' => 200]);
-        $tadirahActivities = $this->Courses->TadirahActivities->find('list', ['limit' => 200]);
-        $tadirahObjects = $this->Courses->TadirahObjects->find('list', ['limit' => 200]);
-        $tadirahTechniques = $this->Courses->TadirahTechniques->find('list', ['limit' => 200]);
-        $this->set(compact('course', 'users', 'deletionReasons', 'countries', 'cities', 'institutions', 'courseParentTypes', 'courseTypes', 'languages', 'courseDurationUnits', 'disciplines', 'tadirahActivities', 'tadirahObjects', 'tadirahTechniques'));
-    }
-
-    /**
-     * Edit method
-     *
-     * @param string|null $id Course id.
-     * @return \Cake\Http\Response|null Redirects on successful edit, renders view otherwise.
-     * @throws \Cake\Datasource\Exception\RecordNotFoundException When record not found.
-     */
-    public function edit($id = null)
-    {
-        $course = $this->Courses->get($id, [
-            'contain' => ['Disciplines', 'TadirahActivities', 'TadirahObjects', 'TadirahTechniques']
-        ]);
-        if ($this->request->is(['patch', 'post', 'put'])) {
-            $course = $this->Courses->patchEntity($course, $this->request->getData());
-            if ($this->Courses->save($course)) {
-                $this->Flash->success(__('The course has been saved.'));
-
-                return $this->redirect(['action' => 'index']);
-            }
-            $this->Flash->error(__('The course could not be saved. Please, try again.'));
-        }
-        $users = $this->Courses->Users->find('list', ['limit' => 200]);
-        $deletionReasons = $this->Courses->DeletionReasons->find('list', ['limit' => 200]);
-        $countries = $this->Courses->Countries->find('list', ['limit' => 200]);
-        $cities = $this->Courses->Cities->find('list', ['limit' => 200]);
-        $institutions = $this->Courses->Institutions->find('list', ['limit' => 200]);
-        $courseParentTypes = $this->Courses->CourseParentTypes->find('list', ['limit' => 200]);
-        $courseTypes = $this->Courses->CourseTypes->find('list', ['limit' => 200]);
-        $languages = $this->Courses->Languages->find('list', ['limit' => 200]);
-        $courseDurationUnits = $this->Courses->CourseDurationUnits->find('list', ['limit' => 200]);
-        $disciplines = $this->Courses->Disciplines->find('list', ['limit' => 200]);
-        $tadirahActivities = $this->Courses->TadirahActivities->find('list', ['limit' => 200]);
-        $tadirahObjects = $this->Courses->TadirahObjects->find('list', ['limit' => 200]);
-        $tadirahTechniques = $this->Courses->TadirahTechniques->find('list', ['limit' => 200]);
-        $this->set(compact('course', 'users', 'deletionReasons', 'countries', 'cities', 'institutions', 'courseParentTypes', 'courseTypes', 'languages', 'courseDurationUnits', 'disciplines', 'tadirahActivities', 'tadirahObjects', 'tadirahTechniques'));
-    }
-
-    /**
-     * Delete method
-     *
-     * @param string|null $id Course id.
-     * @return \Cake\Http\Response|null Redirects to index.
-     * @throws \Cake\Datasource\Exception\RecordNotFoundException When record not found.
-     */
-    public function delete($id = null)
-    {
-        $this->request->allowMethod(['post', 'delete']);
-        $course = $this->Courses->get($id);
-        if ($this->Courses->delete($course)) {
-            $this->Flash->success(__('The course has been deleted.'));
-        } else {
-            $this->Flash->error(__('The course could not be deleted. Please, try again.'));
-        }
-
-        return $this->redirect(['action' => 'index']);
-    }
+    
 }
