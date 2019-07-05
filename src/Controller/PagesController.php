@@ -15,6 +15,7 @@
 namespace App\Controller;
 
 use Cake\Core\Configure;
+use Cake\Event\Event;
 use Cake\Http\Exception\ForbiddenException;
 use Cake\Http\Exception\NotFoundException;
 use Cake\View\Exception\MissingTemplateException;
@@ -28,8 +29,19 @@ use Cake\View\Exception\MissingTemplateException;
  */
 class PagesController extends AppController
 {
-
-    /**
+	
+	
+	public function beforeRender(Event $event) {
+		// bypass forcing data views for this controller only, make no call to parent::beforeRender()
+	}
+	
+	
+	
+	
+	
+	
+	
+	/**
      * Displays a view
      *
      * @param array ...$path Path segments.
@@ -38,8 +50,7 @@ class PagesController extends AppController
      * @throws \Cake\Http\Exception\NotFoundException When the view file could not
      *   be found or \Cake\View\Exception\MissingTemplateException in debug mode.
      */
-    public function display(...$path)
-    {
+    public function display(...$path) {
         $count = count($path);
         if (!$count) {
             return $this->redirect('/');

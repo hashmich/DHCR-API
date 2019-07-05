@@ -21,44 +21,14 @@ class CoursesController extends AppController
      * @return \Cake\Http\Response|void
      */
     
-    
-    private $_allowedFilters = [
-    	'country_id',
-		'city_id',
-		'institution_id',
-		'language_id',
-		'course_type_id',
-		'course_parent_type_id',
-		'discipline_id',
-		'tadirah_object_id',
-		'tadirah_technique_id',
-		'recent',
-		'start_date',
-		'end_date'
-	];
-    
-    private $_containments = [
-		'DeletionReasons',
-		'Countries',
-		'Cities',
-		'Institutions',
-		'CourseParentTypes',
-		'CourseTypes',
-		'Languages',
-		'CourseDurationUnits',
-		'Disciplines',
-		'TadirahTechniques',
-		'TadirahObjects'
-	];
-    
-    
-    public function index() {
-     	$query = $this->Courses->find('all', array(
-        	'contain' => $this->_containments,
-			'conditions' => $this->Courses->getFilter($this->request)
-		));
+    public function initialize() {
+		parent::initialize();
+	}
 	
-		$courses = $query->toList();
+	
+	public function index() {
+     	$this->Courses->evaluateQuery($this->request->getQuery());
+		$courses = $this->Courses->getResults();
 		
 		$this->set('courses', $courses);
         $this->set('_serialize', 'courses');
@@ -66,48 +36,11 @@ class CoursesController extends AppController
     
     
     public function count() {
-		$query = $this->Courses->find('all', array(
-			'contain' => $this->_containments,
-			'conditions' => $this->Courses->getFilter($this->request)
-		));
-		
-		$result = ['course_count' => $query->count()];
+		$this->Courses->evaluateQuery($this->request->getQuery());
+		$result = ['course_count' => $this->Courses->countResults()];
 		
 		$this->set('count', $result);
 		$this->set('_serialize', 'count');
-	}
-    
-    
-    private function _getFilter() {
-		$filter = $this->request->getQuery();
-		$conditions = ['Courses.active' => true];
-		foreach($filter as $key => $value) {
-			if(!in_array($key, $this->_allowedFilters)) {
-				unset($filter[$key]);
-				continue;
-			}
-			if(is_string($value) AND strpos($value, ',') !== false) {
-				$value = explode(',', $value);
-				$value = array_filter($value);	// remove empty elements & non-digits
-				$value = array_filter($value, function($v) { return ctype_digit($v) AND $v > 0; });
-			}
-			switch($key) {
-				case 'recent':
-					if($value == true || $value === '') {
-						$conditions['Courses.deleted'] = false;
-						$conditions['Courses.updated >'] = date('Y-m-d H:i:s', time() - 60*60*24*489);
-					}
-					break;
-				case 'discipline_id':
-				case 'tadirah_object_id':
-				case 'tadirah_technique_id':
-					break;
-				default:
-					$conditions['Courses.'.$key] = $value;
-			}
-		}
-		
-		return $conditions;
 	}
 
     /**
@@ -119,7 +52,7 @@ class CoursesController extends AppController
      */
     public function view($id = null) {
         $course = $this->Courses->get($id, [
-			'contain' => $this->_containments,
+			'contain' => $this->Courses->containments,
 			'conditions' => [
 				//'Courses.id' => $id,
 				'Courses.active' => true

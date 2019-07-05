@@ -5,6 +5,7 @@ use Cake\ORM\Query;
 use Cake\ORM\RulesChecker;
 use Cake\ORM\Table;
 use Cake\Validation\Validator;
+use Cake\Utility\Hash;
 
 /**
  * Courses Model
@@ -79,21 +80,19 @@ class CoursesTable extends Table
         $this->belongsTo('CourseDurationUnits', [
             'foreignKey' => 'course_duration_unit_id'
         ]);
-        $this->belongsToMany('Disciplines', [
-            'foreignKey' => 'course_id',
-            'targetForeignKey' => 'discipline_id',
-            'joinTable' => 'courses_disciplines'
+        $this->hasMany('CoursesDisciplines', [
+            'foreignKey' => 'course_id'
         ]);
-        $this->belongsToMany('TadirahObjects', [
-            'foreignKey' => 'course_id',
-            'targetForeignKey' => 'tadirah_object_id',
-            'joinTable' => 'courses_tadirah_objects'
+        $this->hasMany('CoursesTadirahObjects', [
+            'foreignKey' => 'course_id'
         ]);
-        $this->belongsToMany('TadirahTechniques', [
-            'foreignKey' => 'course_id',
-            'targetForeignKey' => 'tadirah_technique_id',
-            'joinTable' => 'courses_tadirah_techniques'
+        $this->hasMany('CoursesTadirahTechniques', [
+            'foreignKey' => 'course_id'
         ]);
+        
+        $this->belongsToMany('Disciplines');
+        $this->belongsToMany('TadirahTechniques');
+        $this->belongsToMany('TadirahObjects');
     }
 
     /**
@@ -226,4 +225,194 @@ class CoursesTable extends Table
 
         return $rules;
     }
+	
+	
+	// entrance point for querystring evaluation
+	public function evaluateQuery($requestQuery = array()) {
+		$this->getCleanQuery($requestQuery);
+		$this->getFilter();
+		$this->getJoins();
+		$this->getSorters();
+	}
+	
+    
+	public function getCleanQuery($query = array()) {
+		foreach($query as $key => &$value) {
+			if(	!in_array($key, $this->allowedFilters)
+			AND !in_array($key, $this->allowedTags)) {
+				unset($query[$key]);
+				continue;
+			}
+			if(is_string($value) AND strpos($value, ',') !== false) {
+				$value = array_map('trim', explode(',', $value));
+				$value = array_filter($value);    // remove empty elements & non-digits
+				$value = array_filter($value, function ($v) {
+					return ctype_digit($v) AND $v > 0;
+				});
+			}
+		}
+		return $this->query = $query;
+	}
+    
+    
+    public function getFilter() {
+		$conditions = ['Courses.active' => true];
+		foreach($this->query as $key => $value) {
+			if(in_array($key, $this->allowedTags)) continue;
+			switch($key) {
+				case 'recent':
+					if($value == true || $value === '') {
+						$query['recent'] = true;
+						$conditions['Courses.deleted'] = false;
+						$conditions['Courses.updated >'] = date('Y-m-d H:i:s', time() - 60*60*24*489);
+					}
+					break;
+				case 'start_date':
+					if(is_string($value)) $conditions['Courses.created >='] = $value;
+					break;
+				case 'end_date':
+					if(is_string($value)) $conditions['Courses.updated <='] = $value;
+					break;
+				case 'sort_asc':
+				case 'sort_desc':
+					break;
+				default:
+					if(!is_array($value))
+						$conditions['Courses.'.$key] = $value;
+					else
+						$conditions['Courses.'.$key.' IN'] = $value;
+			}
+		}
+		
+		return $this->filter = $conditions;
+	}
+	
+	
+	public function getJoins() {
+    	$joins = [];
+    	foreach($this->query as $key => $value) {
+    		switch($key) {
+    			case 'discipline_id':
+					$joins[] = [
+						'assoc' => 'CoursesDisciplines',
+						'conditions' => [
+							'CoursesDisciplines.discipline_id IN' => $value
+						]
+					];
+					break;
+				case 'tadirah_object_id':
+					$joins[] = [
+						'assoc' => 'CoursesTadirahObjects',
+						'conditions' => [
+							'CoursesTadirahObjects.tadirah_object_id IN' => $value
+						]
+					];
+					break;
+				case 'tadirah_technique_id':
+					$joins[] = [
+						'assoc' => 'CoursesTadirahTechniques',
+						'conditions' => [
+							'CoursesTadirahTechniques.tadirah_techniques_id IN' => $value
+						]
+					];
+			}
+		}
+    	
+    	return $this->joins = $joins;
+	}
+	
+	
+	public function getSorters() {
+    	$sorters = [];
+    	foreach($this->query as $key => $value) {
+    		switch($key) {
+				case 'sort_asc':
+					if(!is_array($value)) {
+						$sorters[$value] = 'ASC';
+					}else{
+						foreach($value as $sort)
+							$sorters[$sort] = 'ASC';
+					}
+					break;
+				case 'sort_desc':
+					if(!is_array($value)) {
+						$sorters[$value] = 'DESC';
+					}else{
+						foreach($value as $sort)
+							$sorters[$sort] = 'DESC';
+					}
+			}
+		}
+    	return $this->sorters = $sorters;
+	}
+	
+	
+	public function getResults() {
+		$query = $this->find()->distinct()
+			->contain($this->containments);
+		foreach($this->joins as $join) {
+			$query->leftJoinWith($join['assoc']);
+			$this->filter[] = $join['conditions'];
+		}
+		$query->order($this->sorters);
+		$query->where($this->filter);
+		
+		return $query->toArray();
+	}
+	
+	
+	public function countResults() {
+		$query = $this->find()->distinct();
+		foreach($this->joins as $join) {
+			$query->leftJoinWith($join['assoc']);
+			$this->filter[] = $join['conditions'];
+		}
+		$query->where($this->filter);
+		
+		return $query->count();
+	}
+	
+	
+	public $query = array();
+	
+	public $joins = array();	// filter by associated data
+	
+	public $filter = array();	// oldschool find conditions
+	
+	public $sorters = array();		// sort criteria
+	
+	
+	public $allowedFilters = [
+		'country_id',
+		'city_id',
+		'institution_id',
+		'language_id',
+		'course_type_id',
+		'course_parent_type_id',
+		'recent',
+		'start_date',
+		'end_date',
+		'sort_asc',
+		'sort_desc'
+	];
+    
+    public $allowedTags = [
+		'discipline_id',
+		'tadirah_object_id',
+		'tadirah_technique_id',
+	];
+	
+	public $containments = [
+		'DeletionReasons',
+		'Countries',
+		'Cities',
+		'Institutions',
+		'CourseParentTypes',
+		'CourseTypes',
+		'Languages',
+		'CourseDurationUnits',
+		'Disciplines',
+		'TadirahTechniques',
+		'TadirahObjects'
+	];
 }

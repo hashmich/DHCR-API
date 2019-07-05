@@ -35,7 +35,10 @@ class CoursesTableTest extends TestCase
         'app.CourseDurationUnits',
         'app.Disciplines',
         'app.TadirahObjects',
-        'app.TadirahTechniques'
+        'app.TadirahTechniques',
+		'app.CoursesTadirahObjects',
+		'app.CoursesTadirahTechniques',
+		'app.CoursesDisciplines'
     ];
 
     /**
@@ -91,4 +94,133 @@ class CoursesTableTest extends TestCase
     {
         $this->markTestIncomplete('Not implemented yet.');
     }
+    
+    
+    public function testGetCleanQuery() {
+		$this->Courses->query = [
+			'foo' => 'bar',
+			'discipline_id' => '1,2, 3 , 4'
+		];
+		$query = $this->Courses->getCleanQuery();
+		$this->assertArrayNotHasKey('foo', $query);
+		$this->assertArrayHasKey('discipline_id', $query);
+		$this->assertTrue(is_array($query['discipline_id']));
+	}
+    
+    
+    public function testGetFilter() {
+		$this->Courses->query = [];
+		// set some values for testing
+		foreach($this->Courses->allowedFilters as $key) {
+			switch($key) {
+				case 'recent':
+					$this->Courses->query[$key] = ''; break;
+				default:
+					// should be some numeric value of a foreign key, delivered as string!
+					$this->Courses->query[$key] = '3';
+			}
+		}
+    	$conditions = $this->Courses->getFilter();
+		
+    	$this->assertArrayHasKey('Courses.active', $conditions);
+		$this->assertEquals($conditions['Courses.active'], true);
+		
+    	foreach($this->Courses->allowedFilters as $key) {
+    		switch($key) {
+				case 'recent':
+					$this->assertEquals($this->Courses->query['recent'], true);	// empty param 'recent' defaults to true
+					$this->assertArrayHasKey('Courses.updated >', $conditions);
+					$this->assertFalse($conditions['Courses.deleted']);
+					// no test for date
+					break;
+				case 'start_date':
+					$this->assertArrayHasKey('Courses.created >=', $conditions);
+					break;
+				case 'end_date':
+					$this->assertArrayHasKey('Courses.updated <=', $conditions);
+					break;
+				case 'sort_asc':
+					// this should not go into the conditions array!
+					$this->assertArrayNotHasKey('Courses.sort_asc', $conditions);
+					break;
+				case 'sort_desc':
+					$this->assertArrayNotHasKey('Courses.sort_desc', $conditions);
+					break;
+    			default:
+					$this->assertArrayHasKey('Courses.'.$key, $conditions);
+					$this->assertEquals($conditions['Courses.'.$key], 3);
+			}
+		}
+	}
+	
+	
+	public function testGetJoins() {
+		$this->Courses->query = [
+			'discipline_id' => [],
+			'tadirah_technique_id' => [3,4],
+			'tadirah_object_id' => [2]
+		];
+		$joins = $this->Courses->getJoins();
+		foreach($joins as $join) {
+			$this->assertArrayHasKey('assoc', $join);
+			$this->assertArrayHasKey('conditions', $join);
+		}
+	}
+	
+	
+	public function testGetSorters() {
+    	$this->Courses->query = [
+    		'sort_asc' => 'name',
+			'sort_desc' => ['id','country_id']
+		];
+    	$sorters = $this->Courses->getSorters();
+    	
+    	$this->assertArrayHasKey('name', $sorters);
+    	$this->assertEquals('ASC', $sorters['name']);
+    	$this->assertArrayHasKey('id', $sorters);
+    	$this->assertArrayHasKey('country_id', $sorters);
+    	$this->assertEquals('DESC', $sorters['country_id']);
+	}
+	
+	
+	public function testGetResults() {
+ 		$query = [
+ 			'country_id' => '1',
+			'discipline_id' => [1,2]
+		];
+    	$this->Courses->evaluateQuery($query);
+    	$courses = $this->Courses->getResults();
+    	
+ 		$this->assertNotEmpty($courses);
+		
+		$query = [
+			'country_id' => '2',
+			'discipline_id' => [1,2]
+		];
+		$this->Courses->evaluateQuery($query);
+		$courses = $this->Courses->getResults();
+		
+		$this->assertEmpty($courses);
+		
+		$query = [
+			'country_id' => '1',
+			'discipline_id' => [3,2]
+		];
+		$this->Courses->evaluateQuery($query);
+		$courses = $this->Courses->getResults();
+		
+		$this->assertEmpty($courses);
+	}
+	
+	
+	public function testCountResults() {
+		$query = [
+			'country_id' => '1',
+			'discipline_id' => [1,2]
+		];
+		$this->Courses->evaluateQuery($query);
+		$result = $this->Courses->countResults();
+		
+		$this->assertEquals(1, $result);
+	}
 }

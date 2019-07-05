@@ -28,7 +28,9 @@ use Cake\Event\Event;
 class AppController extends Controller
 {
 
-    /**
+ 
+	
+	/**
      * Initialization hook method.
      *
      * Use this method to add common initialization code like loading components.
@@ -37,13 +39,17 @@ class AppController extends Controller
      *
      * @return void
      */
-    public function initialize()
-    {
+    public function initialize() {
         parent::initialize();
 
         $this->loadComponent('RequestHandler', [
             'enableBeforeRedirect' => false,
         ]);
+        
+        $this->querystring = $this->request->getQuery();
+        
+        
+        
         //$this->loadComponent('Flash');
 
         /*
@@ -52,4 +58,19 @@ class AppController extends Controller
          */
         //$this->loadComponent('Security');
     }
+    
+    public function beforeFilter(Event $event) {
+		
+    	
+    	return parent::beforeFilter($event);
+	}
+	
+	public function beforeRender(Event $event) {
+		parent::beforeRender($event);
+		
+		$this->viewBuilder()->setClassName('Json');
+	}
+	
+	
+	
 }

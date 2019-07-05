@@ -15,6 +15,7 @@
 namespace App\Controller;
 
 use Cake\Event\Event;
+use Cake\Core\Configure;
 
 /**
  * Error Handling Controller
@@ -56,6 +57,12 @@ class ErrorController extends AppController
         parent::beforeRender($event);
 
         $this->viewBuilder()->setTemplatePath('Error');
+        
+        if(!Configure::read('debug')) {
+			// override _serialize key as we don't want the error message to reveal application code structure (file, line)
+        	$message = $url = $code = null;
+			$this->set('_serialize', ['message','url','code']);
+		}
     }
 
     /**
