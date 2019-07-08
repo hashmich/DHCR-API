@@ -170,16 +170,17 @@ class CoursesTableTest extends TestCase
 	
 	public function testGetSorters() {
     	$this->Courses->query = [
-    		'sort_asc' => 'name',
-			'sort_desc' => ['id','country_id']
+    		'sort' => ['name','Cities.name:desc','Cities.foo']
 		];
     	$sorters = $this->Courses->getSorters();
-    	
-    	$this->assertArrayHasKey('name', $sorters);
-    	$this->assertEquals('ASC', $sorters['name']);
-    	$this->assertArrayHasKey('id', $sorters);
-    	$this->assertArrayHasKey('country_id', $sorters);
-    	$this->assertEquals('DESC', $sorters['country_id']);
+    	// allowed sort criteria should match existing fields from associations involved in the query
+		// if no model is given, the default model 'Courses' should be assumed
+		// ASC is the default sort direction
+    	$this->assertArrayHasKey('Courses.name', $sorters);
+    	$this->assertEquals('ASC', $sorters['Courses.name']);
+    	$this->assertArrayHasKey('Cities.name', $sorters);
+    	$this->assertEquals('DESC', $sorters['Cities.name']);
+    	$this->assertArrayNotHasKey('Cities.foo', $sorters);
 	}
 	
 	

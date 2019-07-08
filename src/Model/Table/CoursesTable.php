@@ -37,7 +37,50 @@ use Cake\Utility\Hash;
  */
 class CoursesTable extends Table
 {
-    /**
+	
+	public $query = array();
+	
+	public $joins = array();	// filter by associated data
+	
+	public $filter = array();	// oldschool find conditions
+	
+	public $sorters = array();		// sort criteria
+	
+	
+	public $allowedFilters = [
+		'country_id',
+		'city_id',
+		'institution_id',
+		'language_id',
+		'course_type_id',
+		'course_parent_type_id',
+		'recent',
+		'start_date',
+		'end_date',
+		'sort'
+	];
+	
+	public $allowedTags = [
+		'discipline_id',
+		'tadirah_object_id',
+		'tadirah_technique_id',
+	];
+	
+	public $containments = [
+		'DeletionReasons',
+		'Countries',
+		'Cities',
+		'Institutions',
+		'CourseParentTypes',
+		'CourseTypes',
+		'Languages',
+		'CourseDurationUnits',
+		'Disciplines',
+		'TadirahTechniques',
+		'TadirahObjects'
+	];
+	
+	/**
      * Initialize method
      *
      * @param array $config The configuration for the Table.
@@ -242,13 +285,14 @@ class CoursesTable extends Table
 			AND !in_array($key, $this->allowedTags)) {
 				unset($query[$key]);
 				continue;
-			}
-			if(is_string($value) AND strpos($value, ',') !== false) {
+			}if(is_string($value) AND strpos($value, ',') !== false) {
 				$value = array_map('trim', explode(',', $value));
-				$value = array_filter($value);    // remove empty elements & non-digits
-				$value = array_filter($value, function ($v) {
-					return ctype_digit($v) AND $v > 0;
-				});
+				$value = array_filter($value);    // remove empty elements
+				// remove non-digits
+				if($key != 'sort')
+					$value = array_filter($value, function ($v) {
+						return ctype_digit($v) AND $v > 0;
+					});
 			}
 		}
 		return $this->query = $query;
@@ -273,8 +317,7 @@ class CoursesTable extends Table
 				case 'end_date':
 					if(is_string($value)) $conditions['Courses.updated <='] = $value;
 					break;
-				case 'sort_asc':
-				case 'sort_desc':
+				case 'sort':
 					break;
 				default:
 					if(!is_array($value))
@@ -323,27 +366,44 @@ class CoursesTable extends Table
 	
 	
 	public function getSorters() {
-    	$sorters = [];
-    	foreach($this->query as $key => $value) {
-    		switch($key) {
-				case 'sort_asc':
-					if(!is_array($value)) {
-						$sorters[$value] = 'ASC';
-					}else{
-						foreach($value as $sort)
-							$sorters[$sort] = 'ASC';
-					}
-					break;
-				case 'sort_desc':
-					if(!is_array($value)) {
-						$sorters[$value] = 'DESC';
-					}else{
-						foreach($value as $sort)
-							$sorters[$sort] = 'DESC';
-					}
+    	if(!empty($this->query['sort'])) {
+    		$value = $this->query['sort'];
+			if(!is_array($value)) {
+				$this->getValidSorter($this->sorters, $value);
+			}else{
+				foreach($value as $sort) {
+					$this->getValidSorter($this->sorters, $sort);
+				}
 			}
 		}
-    	return $this->sorters = $sorters;
+    	return $this->sorters;
+	}
+	
+	public function getValidSorter(&$sorters = array(), $value) {
+		$direction = 'ASC';
+		$sortkey = $value;
+    	if(strpos($value, ':') !== false) {
+			$expl = array_map('trim', explode(':', $value));
+			$expl = array_filter($expl);
+			if(!empty($expl[1]) AND preg_match('/^asc$|^desc$/i', $expl[1]))
+				$direction = strtoupper($expl[1]);
+			$sortkey = $expl[0];
+		}
+  
+		if(strpos($sortkey, '.') === false) $sortkey = 'Courses.'.$sortkey;
+		$expl = array_map('trim', explode('.', $sortkey));
+		$model = $expl[0];
+		$field = $expl[1];
+		if(in_array($model, $this->containments) OR $model == 'Courses') {
+			if($model == 'Courses') {
+				if($this->hasField($field))
+					$this->sorters[$sortkey] = $direction;
+			}else{
+				if($this->{$model}->hasField($field)) {
+					$this->sorters[$sortkey] = $direction;
+				}
+			}
+		}
 	}
 	
 	
@@ -373,46 +433,5 @@ class CoursesTable extends Table
 	}
 	
 	
-	public $query = array();
 	
-	public $joins = array();	// filter by associated data
-	
-	public $filter = array();	// oldschool find conditions
-	
-	public $sorters = array();		// sort criteria
-	
-	
-	public $allowedFilters = [
-		'country_id',
-		'city_id',
-		'institution_id',
-		'language_id',
-		'course_type_id',
-		'course_parent_type_id',
-		'recent',
-		'start_date',
-		'end_date',
-		'sort_asc',
-		'sort_desc'
-	];
-    
-    public $allowedTags = [
-		'discipline_id',
-		'tadirah_object_id',
-		'tadirah_technique_id',
-	];
-	
-	public $containments = [
-		'DeletionReasons',
-		'Countries',
-		'Cities',
-		'Institutions',
-		'CourseParentTypes',
-		'CourseTypes',
-		'Languages',
-		'CourseDurationUnits',
-		'Disciplines',
-		'TadirahTechniques',
-		'TadirahObjects'
-	];
 }
