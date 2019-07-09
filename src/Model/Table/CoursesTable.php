@@ -369,17 +369,18 @@ class CoursesTable extends Table
     	if(!empty($this->query['sort'])) {
     		$value = $this->query['sort'];
 			if(!is_array($value)) {
-				$this->getValidSorter($this->sorters, $value);
+				$this->__getValidSorter($this->sorters, $value);
 			}else{
 				foreach($value as $sort) {
-					$this->getValidSorter($this->sorters, $sort);
+					$this->__getValidSorter($this->sorters, $sort);
 				}
 			}
 		}
     	return $this->sorters;
 	}
 	
-	public function getValidSorter(&$sorters = array(), $value) {
+	// do some checking for contained models, existing fields and assume defaults...
+	private function __getValidSorter(&$sorters = array(), $value) {
 		$direction = 'ASC';
 		$sortkey = $value;
     	if(strpos($value, ':') !== false) {

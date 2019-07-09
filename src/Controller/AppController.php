@@ -46,9 +46,6 @@ class AppController extends Controller
             'enableBeforeRedirect' => false,
         ]);
         
-        $this->querystring = $this->request->getQuery();
-        
-        
         
         //$this->loadComponent('Flash');
 

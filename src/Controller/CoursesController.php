@@ -20,13 +20,7 @@ class CoursesController extends AppController
      *
      * @return \Cake\Http\Response|void
      */
-    
-    public function initialize() {
-		parent::initialize();
-	}
-	
-	
-	public function index() {
+    public function index() {
      	$this->Courses->evaluateQuery($this->request->getQuery());
 		$courses = $this->Courses->getResults();
 		
@@ -54,7 +48,6 @@ class CoursesController extends AppController
         $course = $this->Courses->get($id, [
 			'contain' => $this->Courses->containments,
 			'conditions' => [
-				//'Courses.id' => $id,
 				'Courses.active' => true
 			]
 		]);

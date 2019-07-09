@@ -2,6 +2,7 @@
 namespace App\Model\Entity;
 
 use Cake\ORM\Entity;
+use JeremyHarris\LazyLoad\ORM\LazyLoadEntityTrait;
 
 /**
  * Country Entity
@@ -18,7 +19,10 @@ use Cake\ORM\Entity;
  */
 class Country extends Entity
 {
-    /**
+    use LazyLoadEntityTrait;
+	
+	
+	/**
      * Fields that can be mass assigned using newEntity() or patchEntity().
      *
      * Note that when '*' is set to true, this allows all unspecified fields to
@@ -34,11 +38,19 @@ class Country extends Entity
         'cities' => true,
         'courses' => true,
         'institutions' => true,
-        'users' => true
+        'users' => false
     ];
     
     protected $_hidden = [
     	'domain_name',
-		'stop_words'
+		'stop_words',
+		'courses'
 	];
+	
+    // make virtual fields visible for JSON serialization
+	protected $_virtual = ['course_count'];
+    
+    protected function _getCourseCount() {
+    	return count($this->courses);
+	}
 }

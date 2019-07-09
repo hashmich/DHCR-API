@@ -17,12 +17,25 @@ class CountriesController extends AppController
      *
      * @return \Cake\Http\Response|void
      */
-    public function index()
-    {
-        $countries = $this->paginate($this->Countries);
+    public function index() {
+		$countries = $this->Countries->find()
+			->select(['id','name'])
+			->contain([])
+			->order(['Countries.name' => 'ASC'])
+			->toArray();
 
-        $this->set(compact('countries'));
-    }
+		usort($countries, array($this, '_cmp'));
+	
+		$this->set('countries', $countries);
+		$this->set('_serialize', 'countries');
+	}
+	
+	private static function _cmp($a, $b) {
+		if ($a['course_count'] == $b['course_count']) return 0;
+		return ($a['course_count'] < $b['course_count']) ? 1 : -1;
+	}
+    
+    
 
     /**
      * View method
@@ -34,10 +47,12 @@ class CountriesController extends AppController
     public function view($id = null)
     {
         $country = $this->Countries->get($id, [
-            'contain' => ['Cities', 'Courses', 'Institutions', 'Users']
+            'contain' => [],
+			'fields' => ['id','name']
         ]);
 
         $this->set('country', $country);
+        $this->set('_serialize', 'country');
     }
 
     /**

@@ -1,10 +1,10 @@
 {
     "_readme": [
         "This file locks the dependencies of your project to a known state",
-        "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
+        "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "9e7c0681902f2e4b26e6de859de0cda3",
+    "content-hash": "53a7a81f398640e8c334149891f07512",
     "packages": [
         {
             "name": "aura/intl",
@@ -291,6 +291,43 @@
             ],
             "description": "A composer installer for CakePHP 3.0+ plugins.",
             "time": "2017-12-24T21:09:29+00:00"
+        },
+        {
+            "name": "jeremyharris/cakephp-lazyload",
+            "version": "2.1.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/jeremyharris/cakephp-lazyload.git",
+                "reference": "9c4298a2aec0317e2d3223bbaa8d583fc69eb6a0"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/jeremyharris/cakephp-lazyload/zipball/9c4298a2aec0317e2d3223bbaa8d583fc69eb6a0",
+                "reference": "9c4298a2aec0317e2d3223bbaa8d583fc69eb6a0",
+                "shasum": ""
+            },
+            "require": {
+                "cakephp/orm": ">=3.6.0 <4.0"
+            },
+            "require-dev": {
+                "cakephp/cakephp": ">=3.6.0 <4.0",
+                "cakephp/cakephp-codesniffer": "dev-master",
+                "phpunit/phpunit": "^5.7|^6.0"
+            },
+            "type": "cakephp-plugin",
+            "autoload": {
+                "psr-4": {
+                    "JeremyHarris\\LazyLoad\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "description": "An association lazy-loader for CakePHP",
+            "keywords": [
+                "cakephp",
+                "lazy load",
+                "plugin"
+            ],
+            "time": "2018-04-16T15:04:20+00:00"
         },
         {
             "name": "mobiledetect/mobiledetectlib",
@@ -4240,7 +4277,7 @@
     "prefer-stable": true,
     "prefer-lowest": false,
     "platform": {
-        "php": ">=5.6"
+        "php": ">=7.0"
     },
     "platform-dev": []
 }
