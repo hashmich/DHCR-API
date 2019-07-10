@@ -48,7 +48,7 @@ class Country extends Entity
 	];
 	
     // make virtual fields visible for JSON serialization
-	protected $_virtual = ['course_count'];
+	//protected $_virtual = ['course_count'];
     
     protected function _getCourseCount() {
     	return count($this->courses);

@@ -24,7 +24,16 @@ use Cake\Validation\Validator;
  */
 class CountriesTable extends Table
 {
-    /**
+	
+	public $query = array();
+	
+	public $allowedParameters = [
+		'course_count',
+		'sort_count'
+	];
+	
+	
+	/**
      * Initialize method
      *
      * @param array $config The configuration for the Table.
@@ -33,6 +42,8 @@ class CountriesTable extends Table
     public function initialize(array $config)
     {
         parent::initialize($config);
+	
+		$this->addBehavior('CounterSort');
 
         $this->setTable('countries');
         $this->setDisplayField('name');
@@ -79,4 +90,66 @@ class CountriesTable extends Table
 
         return $validator;
     }
+	
+	
+	// entrance point for querystring evaluation
+	public function evaluateQuery($requestQuery = array()) {
+		$this->getCleanQuery($requestQuery);
+		$this->getFilter();
+	}
+	
+	
+	public function getCleanQuery($query = array()) {
+		foreach($query as $key => $value) {
+			if(!in_array($key, $this->allowedParameters)) {
+				unset($query[$key]);
+				continue;
+			}
+		}
+		return $this->query = $query;
+	}
+	
+	
+	public function getFilter() {
+		foreach($this->query as $key => $value) {
+			switch($key) {
+				case 'sort_count':
+				case 'course_count':
+					if($value == true || $value === '')
+						$this->query[$key] = true;
+					if($key == 'sort_count')
+						$this->query['course_count'] = true;
+			}
+		}
+	}
+    
+    
+    public function getCountry($id = null) {
+    	$country = $this->get($id, [
+			'contain' => [],
+			'fields' => ['id','name']
+		]);
+    	$country->setVirtual(['course_count']);
+    	return $country;
+	}
+	
+	
+	public function getCountries($count = false, $sortCount = false) {
+    	$countries = $this->find()
+			->select(['id','name'])
+			->contain([])
+			->order(['Countries.name' => 'ASC'])
+			->toArray();
+		
+    	if($this->query['course_count']) foreach($countries as &$country)
+			$country->setVirtual(['course_count']);
+    	// sort by course_count descending, using CounterSortBehavior
+    	if($this->query['course_count'] AND $this->query['sort_count'])
+    		$countries = $this->sortByCourseCount($countries);
+
+		return $countries;
+	}
+	
+	
+	
 }
