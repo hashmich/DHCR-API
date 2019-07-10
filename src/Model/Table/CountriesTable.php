@@ -121,6 +121,7 @@ class CountriesTable extends Table
 						$this->query['course_count'] = true;
 			}
 		}
+		return $this->query;
 	}
     
     
@@ -134,17 +135,17 @@ class CountriesTable extends Table
 	}
 	
 	
-	public function getCountries($count = false, $sortCount = false) {
+	public function getCountries() {
     	$countries = $this->find()
 			->select(['id','name'])
 			->contain([])
 			->order(['Countries.name' => 'ASC'])
 			->toArray();
 		
-    	if($this->query['course_count']) foreach($countries as &$country)
+    	if(!empty($this->query['course_count'])) foreach($countries as &$country)
 			$country->setVirtual(['course_count']);
     	// sort by course_count descending, using CounterSortBehavior
-    	if($this->query['course_count'] AND $this->query['sort_count'])
+    	if(!empty($this->query['course_count']) AND !empty($this->query['sort_count']))
     		$countries = $this->sortByCourseCount($countries);
 
 		return $countries;

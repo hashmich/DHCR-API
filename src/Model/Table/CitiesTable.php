@@ -24,7 +24,18 @@ use Cake\Validation\Validator;
  */
 class CitiesTable extends Table
 {
-    /**
+	
+	
+	public $query = array();
+	
+	public $allowedParameters = [
+		'course_count',
+		'sort_count',
+		'group'
+	];
+	
+	
+	/**
      * Initialize method
      *
      * @param array $config The configuration for the Table.
@@ -33,8 +44,10 @@ class CitiesTable extends Table
     public function initialize(array $config)
     {
         parent::initialize($config);
-
-        $this->setTable('cities');
+	
+		$this->addBehavior('CounterSort');
+	
+		$this->setTable('cities');
         $this->setDisplayField('name');
         $this->setPrimaryKey('id');
 
@@ -84,4 +97,69 @@ class CitiesTable extends Table
 
         return $rules;
     }
+	
+	
+	// entrance point for querystring evaluation
+	public function evaluateQuery($requestQuery = array()) {
+		$this->getCleanQuery($requestQuery);
+		$this->getFilter();
+	}
+	
+	
+	public function getCleanQuery($query = array()) {
+		foreach($query as $key => $value) {
+			if(!in_array($key, $this->allowedParameters)) {
+				unset($query[$key]);
+				continue;
+			}
+		}
+		return $this->query = $query;
+	}
+	
+	
+	public function getFilter() {
+		foreach($this->query as $key => $value) {
+			switch($key) {
+				case 'sort_count':
+				case 'course_count':
+				case 'group':
+					if($value == true || $value === '')
+						$this->query[$key] = true;
+					if($key == 'sort_count')
+						$this->query['course_count'] = true;
+			}
+		}
+		return $this->query;
+	}
+	
+	
+	public function getCity($id = null) {
+		$city = $this->get($id, [
+			'contain' => ['Country.name'],
+			'fields' => ['id','name','Countries.name']
+		]);
+		$city->setVirtual(['course_count']);
+		return $city;
+	}
+	
+	
+	public function getCities() {
+		$cities = $this->find()
+			->select(['id','name','Countries.name'])
+			->contain([])
+			->order(['Cities.name' => 'ASC']);
+		if(!empty($this->query['group']))
+			$cities->groupBy('Countries.name');
+		
+		$cities->toArray();
+		
+		if($this->query['course_count']) foreach($cities as &$city)
+			$city->setVirtual(['course_count']);
+		// sort by course_count descending, using CounterSortBehavior
+		if($this->query['course_count'] AND $this->query['sort_count'])
+			$cities = $this->sortByCourseCount($cities);
+		
+		return $cities;
+	}
+ 
 }

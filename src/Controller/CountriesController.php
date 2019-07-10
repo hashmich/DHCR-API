@@ -38,10 +38,7 @@ class CountriesController extends AppController
      * @throws \Cake\Datasource\Exception\RecordNotFoundException When record not found.
      */
     public function view($id = null) {
-        $country = $this->Countries->get($id, [
-            'contain' => [],
-			'fields' => ['id','name']
-        ]);
+        $country = $this->Countries->getCountry($id);
 
         $this->set('country', $country);
         $this->set('_serialize', 'country');

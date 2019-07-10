@@ -24,7 +24,7 @@ class CitiesTableTest extends TestCase
      */
     public $fixtures = [
         'app.Cities',
-        'app.Countries',
+        'app.Cities',
         'app.Courses',
         'app.Institutions'
     ];
@@ -82,4 +82,64 @@ class CitiesTableTest extends TestCase
     {
         $this->markTestIncomplete('Not implemented yet.');
     }
+	
+	
+	public function testGetCleanQuery() {
+		$this->Cities->query = [
+			'foo' => 'bar',
+			'sort_count' => '',
+			'group'
+		];
+		$query = $this->Cities->getCleanQuery();
+		$this->assertArrayNotHasKey('foo', $query);
+		$this->assertArrayHasKey('sort_count', $query);
+		$this->assertArrayHasKey('group', $query);
+	}
+	
+	
+	public function testGetFilter() {
+		$this->Cities->query = [
+			'sort_count' => ''
+		];
+		$query = $this->Cities->getFilter();
+		$this->assertArrayHasKey('sort_count', $query);
+		$this->assertTrue($query['sort_count']);
+		$this->assertArrayHasKey('course_count', $query);
+		$this->assertTrue($query['course_count']);
+		$this->assertArrayHasKey('group', $query);
+		$this->assertTrue($query['group']);
+	}
+	
+	
+	public function testGetCity() {
+		$city = $this->Cities->getCity(1);
+		$this->assertArrayHasKey('course_count', $city);
+	}
+	
+	
+	public function testGetCities() {
+		$this->Cities->query = ['course_count' => true];
+    	$cities = $this->Cities->getCities();
+		foreach($cities as $city) {
+			$this->assertArrayHasKey('course_count', $city);
+		}
+		$this->Cities->query = [];
+		$cities = $this->Cities->getCities();
+		foreach($cities as $city) {
+			// assertArrayNotHasKey is failing here for some reason!?
+			$this->assertFalse(array_key_exists('course_count', $city));
+		}
+		$this->Cities->query = ['course_count' => true,'course_sort' => true];
+		$cities = $this->Cities->getCities();
+		$last = null;
+		foreach($cities as $city) {
+			if($last !== null)
+				$this->assertTrue($last > $city['course_count']);
+			$last = $city['course_count'];
+		}
+		$this->Cities->query = ['group' => true];
+		$cities = $this->Cities->getCities();
+		//TODO...
+	}
+ 
 }

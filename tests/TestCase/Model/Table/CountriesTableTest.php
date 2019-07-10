@@ -90,11 +90,11 @@ class CountriesTableTest extends TestCase
 		$this->Countries->query = [
 			'sort_count' => ''
 		];
-		$this->Countries->getFilter();
-		$this->assertArrayHasKey('sort_count', $this->Countries->query);
-		$this->assertTrue($this->Countries->query['sort_count']);
-		$this->assertArrayHasKey('course_count', $this->Countries->query);
-		$this->assertTrue($this->Countries->query['course_count']);
+		$query = $this->Countries->getFilter();
+		$this->assertArrayHasKey('sort_count', $query);
+		$this->assertTrue($query['sort_count']);
+		$this->assertArrayHasKey('course_count', $query);
+		$this->assertTrue($query['course_count']);
 	}
     
     
@@ -105,16 +105,19 @@ class CountriesTableTest extends TestCase
 	
 	
 	public function testGetCountries() {
- 		$countries = $this->Countries->getCountries(true, false);
+ 		$this->Countries->query = ['course_count' => true];
+    	$countries = $this->Countries->getCountries();
  		foreach($countries as $country) {
  			$this->assertArrayHasKey('course_count', $country);
 		}
-		$countries = $this->Countries->getCountries(false, false);
+		$this->Countries->query = [];
+		$countries = $this->Countries->getCountries();
  		foreach($countries as $country) {
 			// assertArrayNotHasKey is failing here for some reason!?
 			$this->assertFalse(array_key_exists('course_count', $country));
 		}
-		$countries = $this->Countries->getCountries(true, true);
+		$this->Countries->query = ['course_count' => true,'course_sort' => true];
+		$countries = $this->Countries->getCountries();
 		$last = null;
 		foreach($countries as $country) {
 			if($last !== null)

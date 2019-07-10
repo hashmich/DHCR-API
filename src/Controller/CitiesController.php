@@ -17,14 +17,13 @@ class CitiesController extends AppController
      *
      * @return \Cake\Http\Response|void
      */
-    public function index()
-    {
-        $this->paginate = [
-            'contain' => ['Countries']
-        ];
-        $cities = $this->paginate($this->Cities);
-
-        $this->set(compact('cities'));
+    public function index() {
+		$this->Cities->evaluateQuery($this->request->getQuery());
+	
+		$cities = $this->Cities->getCities();
+	
+		$this->set('cities', $cities);
+		$this->set('_serialize', 'cities');
     }
 
     /**
@@ -34,13 +33,11 @@ class CitiesController extends AppController
      * @return \Cake\Http\Response|void
      * @throws \Cake\Datasource\Exception\RecordNotFoundException When record not found.
      */
-    public function view($id = null)
-    {
-        $city = $this->Cities->get($id, [
-            'contain' => ['Countries', 'Courses', 'Institutions']
-        ]);
+    public function view($id = null) {
+        $city = $this->Cities->getCity($id);
 
         $this->set('city', $city);
+		$this->set('_serialize', 'city');
     }
 
     /**

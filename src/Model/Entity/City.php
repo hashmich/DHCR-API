@@ -32,4 +32,15 @@ class City extends Entity
         'courses' => true,
         'institutions' => true
     ];
+    
+    protected $_hidden = [
+    	'courses'
+	];
+	
+	// make virtual fields visible for JSON serialization
+	//protected $_virtual = ['course_count'];
+	
+	protected function _getCourseCount() {
+		return count($this->courses);
+	}
 }
