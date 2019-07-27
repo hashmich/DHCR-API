@@ -24,7 +24,7 @@ class CitiesTableTest extends TestCase
      */
     public $fixtures = [
         'app.Cities',
-        'app.Cities',
+        'app.Countries',
         'app.Courses',
         'app.Institutions'
     ];
@@ -85,15 +85,17 @@ class CitiesTableTest extends TestCase
 	
 	
 	public function testGetCleanQuery() {
-		$this->Cities->query = [
+		$query = [
 			'foo' => 'bar',
 			'sort_count' => '',
-			'group'
+			'group' => true,
+			'country_id' => '3'
 		];
-		$query = $this->Cities->getCleanQuery();
+		$query = $this->Cities->getCleanQuery($query);
 		$this->assertArrayNotHasKey('foo', $query);
 		$this->assertArrayHasKey('sort_count', $query);
 		$this->assertArrayHasKey('group', $query);
+		$this->assertArrayHasKey('country_id', $query);
 	}
 	
 	
@@ -106,14 +108,37 @@ class CitiesTableTest extends TestCase
 		$this->assertTrue($query['sort_count']);
 		$this->assertArrayHasKey('course_count', $query);
 		$this->assertTrue($query['course_count']);
+		
+		$this->Cities->query = ['group' => ''];
+		$query = $this->Cities->getFilter();
 		$this->assertArrayHasKey('group', $query);
 		$this->assertTrue($query['group']);
+		
+		$this->Cities->query = ['group' => '', 'country_id' => '2'];
+		$query = $this->Cities->getFilter();
+		$this->assertArrayNotHasKey('group', $query);
+		$this->assertArrayHasKey('country_id', $query);
+		$this->assertTrue(ctype_digit($query['country_id']));
+		
+		$this->Cities->query = ['group' => '', 'country_id' => '1,2'];
+		$query = $this->Cities->getFilter();
+		$this->assertArrayHasKey('group', $query);
+		$this->assertArrayNotHasKey('country_id', $query);
 	}
 	
 	
 	public function testGetCity() {
 		$city = $this->Cities->getCity(1);
+		$this->__testCity($city);
+	}
+	
+	private function __testCity($city = []) {
 		$this->assertArrayHasKey('course_count', $city);
+		$this->assertArrayHasKey('id', $city);
+		$this->assertArrayHasKey('name', $city);
+		$this->assertArrayHasKey('country_id', $city);
+		$this->assertArrayHasKey('country', $city);
+		$this->assertArrayHasKey('name', $city['country']);
 	}
 	
 	
@@ -122,14 +147,15 @@ class CitiesTableTest extends TestCase
     	$cities = $this->Cities->getCities();
 		foreach($cities as $city) {
 			$this->assertArrayHasKey('course_count', $city);
+			$this->__testCity($city);
 		}
 		$this->Cities->query = [];
 		$cities = $this->Cities->getCities();
 		foreach($cities as $city) {
-			// assertArrayNotHasKey is failing here for some reason!?
-			$this->assertFalse(array_key_exists('course_count', $city));
+			// we retrieve an object here
+			$this->assertObjectNotHasAttribute('course_count', $city);
 		}
-		$this->Cities->query = ['course_count' => true,'course_sort' => true];
+		$this->Cities->query = ['course_count' => true,'sort_count' => true];
 		$cities = $this->Cities->getCities();
 		$last = null;
 		foreach($cities as $city) {
@@ -137,9 +163,17 @@ class CitiesTableTest extends TestCase
 				$this->assertTrue($last > $city['course_count']);
 			$last = $city['course_count'];
 		}
-		$this->Cities->query = ['group' => true];
+		$this->Cities->query = ['group' => true, 'country_id' => '1'];
 		$cities = $this->Cities->getCities();
-		//TODO...
+		foreach($cities as $country => $c_cities) {
+			$this->assertTrue($country === 'Lorem ipsum dolor sit amet');
+			$this->assertTrue(is_array($c_cities));
+			foreach($c_cities as $key => $city) {
+				$this->assertTrue(is_integer($key));
+				$this->assertNotEmpty($city['name']);
+				$this->assertNotEmpty($city['id']);
+			}
+		}
 	}
  
 }

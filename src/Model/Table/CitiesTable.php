@@ -31,7 +31,8 @@ class CitiesTable extends Table
 	public $allowedParameters = [
 		'course_count',
 		'sort_count',
-		'group'
+		'group',
+		'country_id'
 	];
 	
 	
@@ -125,8 +126,15 @@ class CitiesTable extends Table
 				case 'group':
 					if($value == true || $value === '')
 						$this->query[$key] = true;
-					if($key == 'sort_count')
+					if($key == 'sort_count' AND $this->query[$key])
 						$this->query['course_count'] = true;
+					break;
+				case 'country_id':
+					if(ctype_digit($value)) {
+						$this->query['country_id'] = $value;
+					}else{
+						unset($this->query['country_id']);
+					}
 			}
 		}
 		return $this->query;
@@ -135,31 +143,48 @@ class CitiesTable extends Table
 	
 	public function getCity($id = null) {
 		$city = $this->get($id, [
-			'contain' => ['Country.name'],
-			'fields' => ['id','name','Countries.name']
+			'contain' => ['Countries'],
+			'fields' => ['id','name','country_id','Countries.id','Countries.name']
 		]);
 		$city->setVirtual(['course_count']);
 		return $city;
 	}
 	
-	
+	/*
+	 * Due to iterative post-processing, method returns either array of entities or array of arrays!
+	 */
 	public function getCities() {
 		$cities = $this->find()
-			->select(['id','name','Countries.name'])
-			->contain([])
+			->select(['id','name','country_id','Countries.id','Countries.name'])
+			->contain(['Countries'])
 			->order(['Cities.name' => 'ASC']);
-		if(!empty($this->query['group']))
-			$cities->groupBy('Countries.name');
+		if(!empty($this->query['country_id']))
+			$cities->where(['country_id' => $this->query['country_id']]);
 		
-		$cities->toArray();
+		// calling toArray directly does not change the object by reference - assignment required
+		$cities = $cities->toArray();
 		
-		if($this->query['course_count']) foreach($cities as &$city)
+		// iterating will execute
+		if(!empty($this->query['course_count'])) foreach($cities as $city)
 			$city->setVirtual(['course_count']);
-		// sort by course_count descending, using CounterSortBehavior
-		if($this->query['course_count'] AND $this->query['sort_count'])
+		
+		// sort by course_count descending, using CounterSortBehavior - requires array!
+		if(!empty($this->query['course_count']) AND !empty($this->query['sort_count']))
 			$cities = $this->sortByCourseCount($cities);
+		
+		// mapReduce does not work on result array: $cities->mapReduce($mapper, $reducer);
+		if(!empty($this->query['group'])) {
+			$result = [];
+			foreach($cities as $key => $city) {
+				$result[$city['country']['name']][] = $city;
+			}
+			$cities = $result;
+			ksort($cities, SORT_STRING);
+		}
 		
 		return $cities;
 	}
+	
+	
  
 }

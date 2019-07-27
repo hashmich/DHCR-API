@@ -17,15 +17,14 @@ class InstitutionsController extends AppController
      *
      * @return \Cake\Http\Response|void
      */
-    public function index()
-    {
-        $this->paginate = [
-            'contain' => ['Cities', 'Countries']
-        ];
-        $institutions = $this->paginate($this->Institutions);
-
-        $this->set(compact('institutions'));
-    }
+	public function index() {
+		$this->Institutions->evaluateQuery($this->request->getQuery());
+		
+		$institutions = $this->Institutions->getInstitutions();
+		
+		$this->set('institutions', $institutions);
+		$this->set('_serialize', 'institutions');
+	}
 
     /**
      * View method
@@ -34,14 +33,12 @@ class InstitutionsController extends AppController
      * @return \Cake\Http\Response|void
      * @throws \Cake\Datasource\Exception\RecordNotFoundException When record not found.
      */
-    public function view($id = null)
-    {
-        $institution = $this->Institutions->get($id, [
-            'contain' => ['Cities', 'Countries', 'Courses', 'Users']
-        ]);
-
-        $this->set('institution', $institution);
-    }
+	public function view($id = null) {
+		$institution = $this->Institutions->getInstitution($id);
+		
+		$this->set('institution', $institution);
+		$this->set('_serialize', 'institution');
+	}
 
     /**
      * Add method

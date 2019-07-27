@@ -2,6 +2,7 @@
 namespace App\Model\Entity;
 
 use Cake\ORM\Entity;
+use JeremyHarris\LazyLoad\ORM\LazyLoadEntityTrait;
 
 /**
  * Institution Entity
@@ -24,7 +25,11 @@ use Cake\ORM\Entity;
  */
 class Institution extends Entity
 {
-    /**
+	
+	use LazyLoadEntityTrait;
+	
+	
+	/**
      * Fields that can be mass assigned using newEntity() or patchEntity().
      *
      * Note that when '*' is set to true, this allows all unspecified fields to
@@ -52,6 +57,14 @@ class Institution extends Entity
     protected $_hidden = [
     	'lon',
 		'lat',
-		'users'
+		'users',
+		'courses'
 	];
+	
+	// make virtual fields visible for JSON serialization
+	//protected $_virtual = ['course_count'];
+	
+	protected function _getCourseCount() {
+		return count($this->courses);
+	}
 }

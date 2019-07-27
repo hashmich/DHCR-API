@@ -134,7 +134,9 @@ class CountriesTable extends Table
     	return $country;
 	}
 	
-	
+	/*
+	 * Due to iterative post-processing, method returns either array of entities or array of arrays!
+	 */
 	public function getCountries() {
     	$countries = $this->find()
 			->select(['id','name'])

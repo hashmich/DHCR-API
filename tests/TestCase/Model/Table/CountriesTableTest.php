@@ -108,15 +108,15 @@ class CountriesTableTest extends TestCase
  		$this->Countries->query = ['course_count' => true];
     	$countries = $this->Countries->getCountries();
  		foreach($countries as $country) {
- 			$this->assertArrayHasKey('course_count', $country);
+ 			$this->assertNotEmpty($country['course_count']);
 		}
 		$this->Countries->query = [];
 		$countries = $this->Countries->getCountries();
  		foreach($countries as $country) {
-			// assertArrayNotHasKey is failing here for some reason!?
-			$this->assertFalse(array_key_exists('course_count', $country));
+			// we're dealing with an object here
+			$this->assertObjectNotHasAttribute('course_count', $country);
 		}
-		$this->Countries->query = ['course_count' => true,'course_sort' => true];
+		$this->Countries->query = ['course_count' => true,'sort_count' => true];
 		$countries = $this->Countries->getCountries();
 		$last = null;
 		foreach($countries as $country) {
