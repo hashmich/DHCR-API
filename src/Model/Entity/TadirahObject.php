@@ -2,6 +2,7 @@
 namespace App\Model\Entity;
 
 use Cake\ORM\Entity;
+use JeremyHarris\LazyLoad\ORM\LazyLoadEntityTrait;
 
 /**
  * TadirahObject Entity
@@ -14,6 +15,9 @@ use Cake\ORM\Entity;
  */
 class TadirahObject extends Entity
 {
+    
+    use LazyLoadEntityTrait;
+    
     /**
      * Fields that can be mass assigned using newEntity() or patchEntity().
      *
@@ -30,6 +34,11 @@ class TadirahObject extends Entity
     ];
 	
 	protected $_hidden = [
-		'_joinData'
+		'_joinData',
+        'courses'
 	];
+    
+    protected function _getCourseCount() {
+        return count($this->courses);
+    }
 }

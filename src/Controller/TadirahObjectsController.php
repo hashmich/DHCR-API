@@ -17,92 +17,27 @@ class TadirahObjectsController extends AppController
      *
      * @return \Cake\Http\Response|void
      */
-    public function index()
-    {
-        $tadirahObjects = $this->paginate($this->TadirahObjects);
-
-        $this->set(compact('tadirahObjects'));
+    public function index() {
+        $this->TadirahObjects->evaluateQuery($this->request->getQuery());
+        
+        $tadirah_objects = $this->TadirahObjects->getTadirahObjects();
+        
+        $this->set('tadirah_objects', $tadirah_objects);
+        $this->set('_serialize', 'tadirah_objects');
     }
-
+    
+    
     /**
      * View method
      *
-     * @param string|null $id Tadirah Object id.
+     * @param string|null $id TadirahObject id.
      * @return \Cake\Http\Response|void
      * @throws \Cake\Datasource\Exception\RecordNotFoundException When record not found.
      */
-    public function view($id = null)
-    {
-        $tadirahObject = $this->TadirahObjects->get($id, [
-            'contain' => ['Courses']
-        ]);
-
-        $this->set('tadirahObject', $tadirahObject);
-    }
-
-    /**
-     * Add method
-     *
-     * @return \Cake\Http\Response|null Redirects on successful add, renders view otherwise.
-     */
-    public function add()
-    {
-        $tadirahObject = $this->TadirahObjects->newEntity();
-        if ($this->request->is('post')) {
-            $tadirahObject = $this->TadirahObjects->patchEntity($tadirahObject, $this->request->getData());
-            if ($this->TadirahObjects->save($tadirahObject)) {
-                $this->Flash->success(__('The tadirah object has been saved.'));
-
-                return $this->redirect(['action' => 'index']);
-            }
-            $this->Flash->error(__('The tadirah object could not be saved. Please, try again.'));
-        }
-        $courses = $this->TadirahObjects->Courses->find('list', ['limit' => 200]);
-        $this->set(compact('tadirahObject', 'courses'));
-    }
-
-    /**
-     * Edit method
-     *
-     * @param string|null $id Tadirah Object id.
-     * @return \Cake\Http\Response|null Redirects on successful edit, renders view otherwise.
-     * @throws \Cake\Datasource\Exception\RecordNotFoundException When record not found.
-     */
-    public function edit($id = null)
-    {
-        $tadirahObject = $this->TadirahObjects->get($id, [
-            'contain' => ['Courses']
-        ]);
-        if ($this->request->is(['patch', 'post', 'put'])) {
-            $tadirahObject = $this->TadirahObjects->patchEntity($tadirahObject, $this->request->getData());
-            if ($this->TadirahObjects->save($tadirahObject)) {
-                $this->Flash->success(__('The tadirah object has been saved.'));
-
-                return $this->redirect(['action' => 'index']);
-            }
-            $this->Flash->error(__('The tadirah object could not be saved. Please, try again.'));
-        }
-        $courses = $this->TadirahObjects->Courses->find('list', ['limit' => 200]);
-        $this->set(compact('tadirahObject', 'courses'));
-    }
-
-    /**
-     * Delete method
-     *
-     * @param string|null $id Tadirah Object id.
-     * @return \Cake\Http\Response|null Redirects to index.
-     * @throws \Cake\Datasource\Exception\RecordNotFoundException When record not found.
-     */
-    public function delete($id = null)
-    {
-        $this->request->allowMethod(['post', 'delete']);
-        $tadirahObject = $this->TadirahObjects->get($id);
-        if ($this->TadirahObjects->delete($tadirahObject)) {
-            $this->Flash->success(__('The tadirah object has been deleted.'));
-        } else {
-            $this->Flash->error(__('The tadirah object could not be deleted. Please, try again.'));
-        }
-
-        return $this->redirect(['action' => 'index']);
+    public function view($id = null) {
+        $tadirah_object = $this->TadirahObjects->getTadirahObject($id);
+        
+        $this->set('tadirah_object', $tadirah_object);
+        $this->set('_serialize', 'tadirah_object');
     }
 }

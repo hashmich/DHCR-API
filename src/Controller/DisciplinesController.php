@@ -20,10 +20,10 @@ class DisciplinesController extends AppController
     public function index() {
         $this->Disciplines->evaluateQuery($this->request->getQuery());
         
-        $course_parent_types = $this->Disciplines->getDisciplines();
+        $disciplines = $this->Disciplines->getDisciplines();
         
-        $this->set('course_parent_types', $course_parent_types);
-        $this->set('_serialize', 'course_parent_types');
+        $this->set('disciplines', $disciplines);
+        $this->set('_serialize', 'disciplines');
     }
     
     
@@ -35,9 +35,9 @@ class DisciplinesController extends AppController
      * @throws \Cake\Datasource\Exception\RecordNotFoundException When record not found.
      */
     public function view($id = null) {
-        $course_parent_type = $this->Disciplines->getDiscipline($id);
+        $discipline = $this->Disciplines->getDiscipline($id);
         
-        $this->set('course_parent_type', $course_parent_type);
-        $this->set('_serialize', 'course_parent_type');
+        $this->set('discipline', $discipline);
+        $this->set('_serialize', 'discipline');
     }
 }

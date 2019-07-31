@@ -20,10 +20,10 @@ class LanguagesController extends AppController
     public function index() {
         $this->Languages->evaluateQuery($this->request->getQuery());
         
-        $course_parent_types = $this->Languages->getLanguages();
+        $languages = $this->Languages->getLanguages();
         
-        $this->set('course_parent_types', $course_parent_types);
-        $this->set('_serialize', 'course_parent_types');
+        $this->set('languages', $languages);
+        $this->set('_serialize', 'languages');
     }
     
     
@@ -35,9 +35,9 @@ class LanguagesController extends AppController
      * @throws \Cake\Datasource\Exception\RecordNotFoundException When record not found.
      */
     public function view($id = null) {
-        $course_parent_type = $this->Languages->getLanguage($id);
+        $language = $this->Languages->getLanguage($id);
         
-        $this->set('course_parent_type', $course_parent_type);
-        $this->set('_serialize', 'course_parent_type');
+        $this->set('language', $language);
+        $this->set('_serialize', 'language');
     }
 }
