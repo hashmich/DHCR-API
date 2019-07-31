@@ -9,7 +9,7 @@ use Cake\Validation\Validator;
 /**
  * CourseParentTypes Model
  *
- * @property \App\Model\Table\CourseTypesTable|\Cake\ORM\Association\HasMany $CourseTypes
+ * @property \App\Model\Table\CourseParentTypesTable|\Cake\ORM\Association\HasMany $CourseParentTypes
  * @property \App\Model\Table\CoursesTable|\Cake\ORM\Association\HasMany $Courses
  *
  * @method \App\Model\Entity\CourseParentType get($primaryKey, $options = [])
@@ -23,6 +23,13 @@ use Cake\Validation\Validator;
  */
 class CourseParentTypesTable extends Table
 {
+    
+    public $allowedParameters = [
+        'course_count',
+        'sort_count'
+    ];
+    
+    
     /**
      * Initialize method
      *
@@ -32,12 +39,14 @@ class CourseParentTypesTable extends Table
     public function initialize(array $config)
     {
         parent::initialize($config);
-
+    
+        $this->addBehavior('CounterSort');
+    
         $this->setTable('course_parent_types');
         $this->setDisplayField('name');
         $this->setPrimaryKey('id');
 
-        $this->hasMany('CourseTypes', [
+        $this->hasMany('CourseParentTypes', [
             'foreignKey' => 'course_parent_type_id'
         ]);
         $this->hasMany('Courses', [
@@ -65,4 +74,67 @@ class CourseParentTypesTable extends Table
 
         return $validator;
     }
+    
+    
+    // entry point for querystring evaluation
+    public function evaluateQuery($requestQuery = array()) {
+        $this->getCleanQuery($requestQuery);
+        $this->getFilter();
+    }
+    
+    
+    public function getCleanQuery($query = array()) {
+        foreach($query as $key => $value) {
+            if(!in_array($key, $this->allowedParameters)) {
+                unset($query[$key]);
+                continue;
+            }
+        }
+        return $this->query = $query;
+    }
+    
+    
+    public function getFilter() {
+        foreach($this->query as $key => $value) {
+            switch($key) {
+                case 'sort_count':
+                case 'course_count':
+                    if($value == true || $value === '')
+                        $this->query[$key] = true;
+                    if($key == 'sort_count' AND $this->query[$key])
+                        $this->query['course_count'] = true;
+                    break;
+            }
+        }
+        return $this->query;
+    }
+    
+    
+    public function getCourseParentType($id = null) {
+        $record = $this->get($id, [
+            'contain' => [],
+            'fields' => ['id','name']
+        ]);
+        $record->setVirtual(['course_count']);
+        return $record;
+    }
+    
+    /*
+     * Due to iterative post-processing, method returns either array of entities or array of arrays!
+     */
+    public function getCourseParentTypes() {
+        $records = $this->find()
+            ->select(['id','name'])
+            ->contain([])
+            ->toArray();
+        
+        if(!empty($this->query['course_count']) OR !empty($this->query['sort_count']))
+            foreach($records as &$record) $record->setVirtual(['course_count']);
+        // sort by course_count descending, using CounterSortBehavior
+        if(!empty($this->query['sort_count']))
+            $records = $this->sortByCourseCount($records);
+        
+        return $records;
+    }
+    
 }

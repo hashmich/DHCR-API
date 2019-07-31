@@ -143,12 +143,12 @@ class CountriesTable extends Table
 			->contain([])
 			->order(['Countries.name' => 'ASC'])
 			->toArray();
-		
-    	if(!empty($this->query['course_count'])) foreach($countries as &$country)
-			$country->setVirtual(['course_count']);
-    	// sort by course_count descending, using CounterSortBehavior
-    	if(!empty($this->query['course_count']) AND !empty($this->query['sort_count']))
-    		$countries = $this->sortByCourseCount($countries);
+        
+        if(!empty($this->query['course_count']) OR !empty($this->query['sort_count']))
+            foreach($countries as &$country) $country->setVirtual(['course_count']);
+        // sort by course_count descending, using CounterSortBehavior
+        if(!empty($this->query['sort_count']))
+            $countries = $this->sortByCourseCount($countries);
 
 		return $countries;
 	}

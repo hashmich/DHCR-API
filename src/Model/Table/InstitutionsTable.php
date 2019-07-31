@@ -200,14 +200,12 @@ class InstitutionsTable extends Table
 		
 		// calling toArray directly does not change the object by reference - assignment required
 		$institutions = $institutions->toArray();
-		
-		// iterating will execute
-		if(!empty($this->query['course_count'])) foreach($institutions as $institution)
-			$institution->setVirtual(['course_count']);
-		
-		// sort by course_count descending, using CounterSortBehavior - requires array!
-		if(!empty($this->query['course_count']) AND !empty($this->query['sort_count']))
-			$institutions = $this->sortByCourseCount($institutions);
+        
+        if(!empty($this->query['course_count']) OR !empty($this->query['sort_count']))
+            foreach($institutions as &$institution) $institution->setVirtual(['course_count']);
+        // sort by course_count descending, using CounterSortBehavior
+        if(!empty($this->query['sort_count']))
+            $institutions = $this->sortByCourseCount($institutions);
 		
 		// mapReduce does not work on result array: $institution->mapReduce($mapper, $reducer);
 		if(!empty($this->query['group'])) {

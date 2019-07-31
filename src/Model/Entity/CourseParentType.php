@@ -2,6 +2,7 @@
 namespace App\Model\Entity;
 
 use Cake\ORM\Entity;
+use JeremyHarris\LazyLoad\ORM\LazyLoadEntityTrait;
 
 /**
  * CourseParentType Entity
@@ -14,6 +15,9 @@ use Cake\ORM\Entity;
  */
 class CourseParentType extends Entity
 {
+    
+    use LazyLoadEntityTrait;
+    
     /**
      * Fields that can be mass assigned using newEntity() or patchEntity().
      *
@@ -28,4 +32,13 @@ class CourseParentType extends Entity
         'course_types' => true,
         'courses' => true
     ];
+    
+    protected $_hidden = [
+        'courses'
+    ];
+    
+    
+    protected function _getCourseCount() {
+        return count($this->courses);
+    }
 }

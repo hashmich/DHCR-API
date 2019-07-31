@@ -164,13 +164,11 @@ class CitiesTable extends Table
 		// calling toArray directly does not change the object by reference - assignment required
 		$cities = $cities->toArray();
 		
-		// iterating will execute
-		if(!empty($this->query['course_count'])) foreach($cities as $city)
-			$city->setVirtual(['course_count']);
-		
-		// sort by course_count descending, using CounterSortBehavior - requires array!
-		if(!empty($this->query['course_count']) AND !empty($this->query['sort_count']))
-			$cities = $this->sortByCourseCount($cities);
+		if(!empty($this->query['course_count']) OR !empty($this->query['sort_count']))
+            foreach($cities as &$city) $city->setVirtual(['course_count']);
+        // sort by course_count descending, using CounterSortBehavior
+        if(!empty($this->query['sort_count']))
+            $cities = $this->sortByCourseCount($cities);
 		
 		// mapReduce does not work on result array: $cities->mapReduce($mapper, $reducer);
 		if(!empty($this->query['group'])) {

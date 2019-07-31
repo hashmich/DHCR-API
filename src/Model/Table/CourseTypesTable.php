@@ -153,11 +153,11 @@ class CourseTypesTable extends Table
 			->contain(['CourseParentTypes'])
 			->toArray();
 		
-		if(!empty($this->query['course_count'])) foreach($records as &$record)
-			$record->setVirtual(['course_count','full_name']);
-		// sort by course_count descending, using CounterSortBehavior
-		if(!empty($this->query['course_count']) AND !empty($this->query['sort_count']))
-			$records = $this->sortByCourseCount($records);
+		if(!empty($this->query['course_count']) OR !empty($this->query['sort_count']))
+            foreach($records as &$record) $record->setVirtual(['course_count']);
+        // sort by course_count descending, using CounterSortBehavior
+        if(!empty($this->query['sort_count']))
+            $records = $this->sortByCourseCount($records);
 		
 		return $records;
 	}
