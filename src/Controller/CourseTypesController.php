@@ -17,95 +17,27 @@ class CourseTypesController extends AppController
      *
      * @return \Cake\Http\Response|void
      */
-    public function index()
-    {
-        $this->paginate = [
-            'contain' => ['CourseParentTypes']
-        ];
-        $courseTypes = $this->paginate($this->CourseTypes);
-
-        $this->set(compact('courseTypes'));
+    public function index() {
+        $this->CourseTypes->evaluateQuery($this->request->getQuery());
+        
+        $course_types = $this->CourseTypes->getCourseTypes();
+        
+        $this->set('course_types', $course_types);
+        $this->set('_serialize', 'course_types');
     }
-
+    
+    
     /**
      * View method
      *
-     * @param string|null $id Course Type id.
+     * @param string|null $id CourseType id.
      * @return \Cake\Http\Response|void
      * @throws \Cake\Datasource\Exception\RecordNotFoundException When record not found.
      */
-    public function view($id = null)
-    {
-        $courseType = $this->CourseTypes->get($id, [
-            'contain' => ['CourseParentTypes', 'Courses']
-        ]);
-
-        $this->set('courseType', $courseType);
-    }
-
-    /**
-     * Add method
-     *
-     * @return \Cake\Http\Response|null Redirects on successful add, renders view otherwise.
-     */
-    public function add()
-    {
-        $courseType = $this->CourseTypes->newEntity();
-        if ($this->request->is('post')) {
-            $courseType = $this->CourseTypes->patchEntity($courseType, $this->request->getData());
-            if ($this->CourseTypes->save($courseType)) {
-                $this->Flash->success(__('The course type has been saved.'));
-
-                return $this->redirect(['action' => 'index']);
-            }
-            $this->Flash->error(__('The course type could not be saved. Please, try again.'));
-        }
-        $courseParentTypes = $this->CourseTypes->CourseParentTypes->find('list', ['limit' => 200]);
-        $this->set(compact('courseType', 'courseParentTypes'));
-    }
-
-    /**
-     * Edit method
-     *
-     * @param string|null $id Course Type id.
-     * @return \Cake\Http\Response|null Redirects on successful edit, renders view otherwise.
-     * @throws \Cake\Datasource\Exception\RecordNotFoundException When record not found.
-     */
-    public function edit($id = null)
-    {
-        $courseType = $this->CourseTypes->get($id, [
-            'contain' => []
-        ]);
-        if ($this->request->is(['patch', 'post', 'put'])) {
-            $courseType = $this->CourseTypes->patchEntity($courseType, $this->request->getData());
-            if ($this->CourseTypes->save($courseType)) {
-                $this->Flash->success(__('The course type has been saved.'));
-
-                return $this->redirect(['action' => 'index']);
-            }
-            $this->Flash->error(__('The course type could not be saved. Please, try again.'));
-        }
-        $courseParentTypes = $this->CourseTypes->CourseParentTypes->find('list', ['limit' => 200]);
-        $this->set(compact('courseType', 'courseParentTypes'));
-    }
-
-    /**
-     * Delete method
-     *
-     * @param string|null $id Course Type id.
-     * @return \Cake\Http\Response|null Redirects to index.
-     * @throws \Cake\Datasource\Exception\RecordNotFoundException When record not found.
-     */
-    public function delete($id = null)
-    {
-        $this->request->allowMethod(['post', 'delete']);
-        $courseType = $this->CourseTypes->get($id);
-        if ($this->CourseTypes->delete($courseType)) {
-            $this->Flash->success(__('The course type has been deleted.'));
-        } else {
-            $this->Flash->error(__('The course type could not be deleted. Please, try again.'));
-        }
-
-        return $this->redirect(['action' => 'index']);
+    public function view($id = null) {
+        $course_type = $this->CourseTypes->getCourseType($id);
+        
+        $this->set('course_type', $course_type);
+        $this->set('_serialize', 'course_type');
     }
 }

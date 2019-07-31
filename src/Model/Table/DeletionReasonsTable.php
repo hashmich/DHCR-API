@@ -61,4 +61,23 @@ class DeletionReasonsTable extends Table
 
         return $validator;
     }
+	
+	
+	public function getDeletionReason($id = null) {
+		$record = $this->get($id, [
+			'contain' => [],
+			'fields' => ['id','name']
+		]);
+		return $record;
+	}
+	
+	
+	public function getDeletionReasons() {
+		$records = $this->find()
+			->select(['id','name'])
+			->contain([])
+			->toArray();
+		return $records;
+	}
+ 
 }

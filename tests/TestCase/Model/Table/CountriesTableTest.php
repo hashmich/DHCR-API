@@ -76,11 +76,11 @@ class CountriesTableTest extends TestCase
 	
 	
 	public function testGetCleanQuery() {
-		$this->Countries->query = [
+		$query = [
 			'foo' => 'bar',
 			'sort_count' => ''
 		];
-		$query = $this->Countries->getCleanQuery();
+		$query = $this->Countries->getCleanQuery($query);
 		$this->assertArrayNotHasKey('foo', $query);
 		$this->assertArrayHasKey('sort_count', $query);
 	}

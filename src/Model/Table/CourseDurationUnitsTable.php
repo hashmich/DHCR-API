@@ -61,4 +61,25 @@ class CourseDurationUnitsTable extends Table
 
         return $validator;
     }
+	
+	
+	
+	public function getCourseDurationUnit($id = null) {
+		$record = $this->get($id, [
+			'contain' => [],
+			'fields' => ['id','name']
+		]);
+		return $record;
+	}
+	
+	
+	public function getCourseDurationUnits() {
+		$records = $this->find()
+			->select(['id','name'])
+			->contain([])
+			->toArray();
+		return $records;
+	}
+ 
+ 
 }

@@ -70,4 +70,22 @@ class DeletionReasonsTableTest extends TestCase
     {
         $this->markTestIncomplete('Not implemented yet.');
     }
+	
+	
+	public function testGetDeletionReason() {
+		$record = $this->DeletionReasons->getDeletionReason(1);
+		$this->assertArrayHasKey('id', $record);
+		$this->assertArrayHasKey('name', $record);
+	}
+	
+	
+	public function testGetDeletionReasons() {
+		$this->DeletionReasons->query = [];
+		$records = $this->DeletionReasons->getDeletionReasons();
+		foreach($records as $record) {
+			$this->assertArrayHasKey('id', $record);
+			$this->assertArrayHasKey('name', $record);
+		}
+	}
+ 
 }

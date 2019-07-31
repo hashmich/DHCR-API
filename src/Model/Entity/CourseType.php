@@ -2,6 +2,7 @@
 namespace App\Model\Entity;
 
 use Cake\ORM\Entity;
+use JeremyHarris\LazyLoad\ORM\LazyLoadEntityTrait;
 
 /**
  * CourseType Entity
@@ -15,7 +16,11 @@ use Cake\ORM\Entity;
  */
 class CourseType extends Entity
 {
-    /**
+	
+	use LazyLoadEntityTrait;
+	
+	
+	/**
      * Fields that can be mass assigned using newEntity() or patchEntity().
      *
      * Note that when '*' is set to true, this allows all unspecified fields to
@@ -30,4 +35,19 @@ class CourseType extends Entity
         'course_parent_type' => true,
         'courses' => true
     ];
+    
+    protected $_hidden = [
+        'courses'
+    ];
+	
+	// make virtual fields visible for JSON serialization
+	//protected $_virtual = ['full_name'];
+	
+	protected function _getCourseCount() {
+		return count($this->courses);
+	}
+	
+	protected function _getFullName() {
+	    return $this->course_parent_type->name . ' - ' . $this->name;
+    }
 }

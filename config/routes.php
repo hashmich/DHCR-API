@@ -43,7 +43,7 @@ use Cake\Routing\Route\DashedRoute;
  * constructor in your `src/Application.php` file to change this behavior.
  *
  */
-Router::defaultRouteClass(DashedRoute::class);
+Router::defaultRouteClass(\Cake\Routing\Route\InflectedRoute::class);
 
 Router::extensions(['json']);
 
@@ -90,7 +90,7 @@ Router::scope('/', function (RouteBuilder $routes) {
      * You can remove these routes once you've connected the
      * routes you want in your application.
      */
-    $routes->fallbacks(DashedRoute::class);
+    $routes->fallbacks(\Cake\Routing\Route\InflectedRoute::class);
 });
 
 /**

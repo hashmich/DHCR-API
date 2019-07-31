@@ -27,9 +27,6 @@ class CountriesController extends AppController
 	}
 	
 	
-    
-    
-
     /**
      * View method
      *
