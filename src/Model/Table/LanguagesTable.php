@@ -22,6 +22,13 @@ use Cake\Validation\Validator;
  */
 class LanguagesTable extends Table
 {
+    
+    public $allowedParameters = [
+        'course_count',
+        'sort_count'
+    ];
+    
+    
     /**
      * Initialize method
      *
@@ -31,7 +38,9 @@ class LanguagesTable extends Table
     public function initialize(array $config)
     {
         parent::initialize($config);
-
+    
+        $this->addBehavior('CounterSort');
+    
         $this->setTable('languages');
         $this->setDisplayField('name');
         $this->setPrimaryKey('id');
@@ -61,4 +70,68 @@ class LanguagesTable extends Table
 
         return $validator;
     }
+    
+    
+    // entry point for querystring evaluation
+    public function evaluateQuery($requestQuery = array()) {
+        $this->getCleanQuery($requestQuery);
+        $this->getFilter();
+    }
+    
+    
+    public function getCleanQuery($query = array()) {
+        foreach($query as $key => $value) {
+            if(!in_array($key, $this->allowedParameters)) {
+                unset($query[$key]);
+                continue;
+            }
+        }
+        return $this->query = $query;
+    }
+    
+    
+    public function getFilter() {
+        foreach($this->query as $key => $value) {
+            switch($key) {
+                case 'sort_count':
+                case 'course_count':
+                    if($value == true || $value === '')
+                        $this->query[$key] = true;
+                    if($key == 'sort_count' AND $this->query[$key])
+                        $this->query['course_count'] = true;
+                    break;
+            }
+        }
+        return $this->query;
+    }
+    
+    
+    public function getLanguage($id = null) {
+        $record = $this->get($id, [
+            'contain' => [],
+            'fields' => ['id','name']
+        ]);
+        $record->setVirtual(['course_count']);
+        return $record;
+    }
+    
+    /*
+     * Due to iterative post-processing, method returns either array of entities or array of arrays!
+     */
+    public function getLanguages() {
+        $records = $this->find()
+            ->select(['id','name'])
+            ->contain([])
+            ->order(['Languages.name' => 'ASC'])
+            ->toArray();
+        
+        if(!empty($this->query['course_count']) OR !empty($this->query['sort_count']))
+            foreach($records as &$record) $record->setVirtual(['course_count']);
+        // sort by course_count descending, using CounterSortBehavior
+        if(!empty($this->query['sort_count']))
+            $records = $this->sortByCourseCount($records);
+        
+        return $records;
+    }
+    
 }

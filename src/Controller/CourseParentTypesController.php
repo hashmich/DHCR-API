@@ -12,11 +12,7 @@ use App\Controller\AppController;
  */
 class CourseParentTypesController extends AppController
 {
-    /**
-     * Index method
-     *
-     * @return \Cake\Http\Response|void
-     */
+    
     /**
      * Index method
      *
