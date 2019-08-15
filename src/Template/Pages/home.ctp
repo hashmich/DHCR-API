@@ -64,6 +64,12 @@ $this->layout = false;
         <p>
             <a href="https://registries.clarin-dariah.eu/courses" target="_blank">DHCR Home Page</a>
         </p>
+        <h4>Support</h4>
+        <p>
+            <a href="mailto:hendrik@clarin.eu?subject=[DHCR-API] Support" target="_blank">
+                hendrik@clarin.eu
+            </a>
+        </p>
     </div>
     
     <div class="columns large-6">
