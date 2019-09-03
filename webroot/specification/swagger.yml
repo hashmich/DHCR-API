@@ -1094,6 +1094,7 @@ components:
           description: >
             This flag is meant to be set for courses that are available and can 
             be studied online solely. 
+          example: false
         language_id:
           type: integer
           description: >
