@@ -1089,6 +1089,12 @@ components:
             If this field is present on update, it will be ignored. 
             Its value becomes determined by mapping the course_type_id to a parent_type_id.
           example: 1
+        online: 
+          type: boolean
+          description: >
+            This flag is meant to be set for courses that are available and can 
+            be studied online solely. 
+          example: false
         language_id:
           type: integer
           description: >
