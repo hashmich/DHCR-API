@@ -45,7 +45,7 @@ class AppController extends Controller
         $this->loadComponent('RequestHandler', [
             'enableBeforeRedirect' => false,
         ]);
-        
+        $this->response = $this->response->withHeader('Access-Control-Allow-Origin', '*');
         
         //$this->loadComponent('Flash');
 
@@ -64,7 +64,6 @@ class AppController extends Controller
 	
 	public function beforeRender(Event $event) {
 		parent::beforeRender($event);
-		
 		$this->viewBuilder()->setClassName('Json');
 	}
 	
