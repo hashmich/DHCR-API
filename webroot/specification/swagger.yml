@@ -31,6 +31,7 @@ paths:
         Default sorting is courses primary identifier, ascending.
       parameters:
         - $ref: "#/components/parameters/recent"
+        - $ref: "#/components/parameters/online"
         - $ref: "#/components/parameters/city_id"
         - $ref: "#/components/parameters/country_id"
         - $ref: "#/components/parameters/institution_id"
@@ -719,6 +720,19 @@ components:
         type: boolean
         enum:
           - true
+      allowEmptyValue: true
+    online:
+      in: query
+      name: online
+      description: >
+        Using this parameter, the registry can be queried for either online
+        courses (true), or on-campus courses (false). Omitting the parameter or passing NULL or 
+        an empty string will result in both types being returned. 
+      schema: 
+        type: boolean
+        enum:
+          - true
+          - false
       allowEmptyValue: true
     group:
       in: query
