@@ -726,8 +726,20 @@ components:
       name: online
       description: >
         Using this parameter, the registry can be queried for either online
-        courses (true), or on-campus courses (false). Omitting the parameter or passing NULL or 
-        an empty string will result in both types being returned. 
+        courses (true), or on-campus courses (false). 
+        Omitting the parameter or an empty string will result in both types being returned. 
+      schema: 
+        type: boolean
+        enum:
+          - true
+          - false
+      allowEmptyValue: true
+    recurring:
+      in: query
+      name: recurring
+      description: >
+        Courses may either be one-off workshops or recurring courses or programmes. 
+        Omitting the parameter or an empty string will result in both types being returned. 
       schema: 
         type: boolean
         enum:
