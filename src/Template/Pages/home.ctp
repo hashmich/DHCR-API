@@ -62,7 +62,7 @@ $this->layout = false;
         </p>
         <p>Visit the Digital Humanities Course Registry home page for more information!</p>
         <p>
-            <a href="https://registries.clarin-dariah.eu/courses" target="_blank">DHCR Home Page</a>
+            <a href="https://dhcr.clarin-dariah.eu/info/#data" target="_blank">DHCR Info Page</a>
         </p>
         <h4>Support</h4>
         <p>
@@ -75,7 +75,7 @@ $this->layout = false;
     <div class="columns large-6">
         <h4>Documentation</h4>
         <p>
-            <a href="https://app.swaggerhub.com/apis-docs/hashmich/DHCR-API/1.0" target="_blank">
+            <a href="https://app.swaggerhub.com/apis-docs/hashmich/DHCR-API" target="_blank">
                 API docs on Swagger
             </a>
         </p>
