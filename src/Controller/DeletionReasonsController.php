@@ -12,22 +12,24 @@ use App\Controller\AppController;
  */
 class DeletionReasonsController extends AppController
 {
-	/**
+    public $modelClass = 'DhcrCore.DeletionReasons';
+
+    /**
 	 * Index method
 	 *
 	 * @return \Cake\Http\Response|void
 	 */
 	public function index() {
 		$deletion_reasons = $this->DeletionReasons->getDeletionReasons();
-		
+
 		$this->set('deletion_reasons', $deletion_reasons);
 		$this->set('_serialize', 'deletion_reasons');
 	}
-	
-	
-	
-	
-	
+
+
+
+
+
 	/**
 	 * View method
 	 *
@@ -37,7 +39,7 @@ class DeletionReasonsController extends AppController
 	 */
 	public function view($id = null) {
 		$deletion_reasons = $this->DeletionReasons->getDeletionReason($id);
-		
+
 		$this->set('deletion_reasons', $deletion_reasons);
 		$this->set('_serialize', 'deletion_reasons');
 	}

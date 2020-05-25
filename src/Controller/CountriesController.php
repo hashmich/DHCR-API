@@ -12,6 +12,8 @@ use App\Controller\AppController;
  */
 class CountriesController extends AppController
 {
+    public $modelClass = 'DhcrCore.Countries';
+
     /**
      * Index method
      *
@@ -19,14 +21,14 @@ class CountriesController extends AppController
      */
     public function index() {
 		$this->Countries->evaluateQuery($this->request->getQuery());
-    	
+
     	$countries = $this->Countries->getCountries();
-	
+
 		$this->set('countries', $countries);
 		$this->set('_serialize', 'countries');
 	}
-	
-	
+
+
     /**
      * View method
      *
@@ -41,5 +43,5 @@ class CountriesController extends AppController
         $this->set('_serialize', 'country');
     }
 
-    
+
 }

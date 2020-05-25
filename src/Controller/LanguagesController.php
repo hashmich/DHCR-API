@@ -12,6 +12,8 @@ use App\Controller\AppController;
  */
 class LanguagesController extends AppController
 {
+    public $modelClass = 'DhcrCore.Languages';
+
     /**
      * Index method
      *
@@ -19,14 +21,14 @@ class LanguagesController extends AppController
      */
     public function index() {
         $this->Languages->evaluateQuery($this->request->getQuery());
-        
+
         $languages = $this->Languages->getLanguages();
-        
+
         $this->set('languages', $languages);
         $this->set('_serialize', 'languages');
     }
-    
-    
+
+
     /**
      * View method
      *
@@ -36,7 +38,7 @@ class LanguagesController extends AppController
      */
     public function view($id = null) {
         $language = $this->Languages->getLanguage($id);
-        
+
         $this->set('language', $language);
         $this->set('_serialize', 'language');
     }

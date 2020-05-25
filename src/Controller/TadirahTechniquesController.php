@@ -12,6 +12,8 @@ use App\Controller\AppController;
  */
 class TadirahTechniquesController extends AppController
 {
+    public $modelClass = 'DhcrCore.TadirahTechniques';
+
     /**
      * Index method
      *
@@ -19,14 +21,14 @@ class TadirahTechniquesController extends AppController
      */
     public function index() {
         $this->TadirahTechniques->evaluateQuery($this->request->getQuery());
-        
+
         $tadirah_techniques = $this->TadirahTechniques->getTadirahTechniques();
-        
+
         $this->set('tadirah_techniques', $tadirah_techniques);
         $this->set('_serialize', 'tadirah_techniques');
     }
-    
-    
+
+
     /**
      * View method
      *
@@ -36,7 +38,7 @@ class TadirahTechniquesController extends AppController
      */
     public function view($id = null) {
         $tadirah_technique = $this->TadirahTechniques->getTadirahTechnique($id);
-        
+
         $this->set('tadirah_technique', $tadirah_technique);
         $this->set('_serialize', 'tadirah_technique');
     }

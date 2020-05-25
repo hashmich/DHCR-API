@@ -37,6 +37,8 @@ class Application extends BaseApplication
         // Call parent to load bootstrap from files.
         parent::bootstrap();
 
+        $this->addPlugin('DhcrCore');
+
         if (PHP_SAPI === 'cli') {
             try {
                 $this->addPlugin('Bake');

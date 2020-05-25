@@ -12,6 +12,8 @@ use App\Controller\AppController;
  */
 class DisciplinesController extends AppController
 {
+    public $modelClass = 'DhcrCore.Disciplines';
+
     /**
      * Index method
      *
@@ -19,14 +21,14 @@ class DisciplinesController extends AppController
      */
     public function index() {
         $this->Disciplines->evaluateQuery($this->request->getQuery());
-        
+
         $disciplines = $this->Disciplines->getDisciplines();
-        
+
         $this->set('disciplines', $disciplines);
         $this->set('_serialize', 'disciplines');
     }
-    
-    
+
+
     /**
      * View method
      *
@@ -36,7 +38,7 @@ class DisciplinesController extends AppController
      */
     public function view($id = null) {
         $discipline = $this->Disciplines->getDiscipline($id);
-        
+
         $this->set('discipline', $discipline);
         $this->set('_serialize', 'discipline');
     }

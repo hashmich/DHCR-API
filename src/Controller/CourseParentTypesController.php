@@ -12,7 +12,9 @@ use App\Controller\AppController;
  */
 class CourseParentTypesController extends AppController
 {
-    
+    public $modelClass = 'DhcrCore.CourseParentTypes';
+
+
     /**
      * Index method
      *
@@ -20,14 +22,14 @@ class CourseParentTypesController extends AppController
      */
     public function index() {
         $this->CourseParentTypes->evaluateQuery($this->request->getQuery());
-        
+
         $course_parent_types = $this->CourseParentTypes->getCourseParentTypes();
-        
+
         $this->set('course_parent_types', $course_parent_types);
         $this->set('_serialize', 'course_parent_types');
     }
-    
-    
+
+
     /**
      * View method
      *
@@ -37,7 +39,7 @@ class CourseParentTypesController extends AppController
      */
     public function view($id = null) {
         $course_parent_type = $this->CourseParentTypes->getCourseParentType($id);
-        
+
         $this->set('course_parent_type', $course_parent_type);
         $this->set('_serialize', 'course_parent_type');
     }

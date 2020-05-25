@@ -12,6 +12,8 @@ use App\Controller\AppController;
  */
 class CitiesController extends AppController
 {
+    public $modelClass = 'DhcrCore.Cities';
+
     /**
      * Index method
      *
@@ -19,9 +21,9 @@ class CitiesController extends AppController
      */
     public function index() {
 		$this->Cities->evaluateQuery($this->request->getQuery());
-	
+
 		$cities = $this->Cities->getCities();
-	
+
 		$this->set('cities', $cities);
 		$this->set('_serialize', 'cities');
     }
@@ -40,5 +42,5 @@ class CitiesController extends AppController
 		$this->set('_serialize', 'city');
     }
 
-   
+
 }

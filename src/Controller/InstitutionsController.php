@@ -12,6 +12,8 @@ use App\Controller\AppController;
  */
 class InstitutionsController extends AppController
 {
+    public $modelClass = 'DhcrCore.Institutions';
+
     /**
      * Index method
      *
@@ -19,9 +21,9 @@ class InstitutionsController extends AppController
      */
 	public function index() {
 		$this->Institutions->evaluateQuery($this->request->getQuery());
-		
+
 		$institutions = $this->Institutions->getInstitutions();
-		
+
 		$this->set('institutions', $institutions);
 		$this->set('_serialize', 'institutions');
 	}
@@ -35,10 +37,10 @@ class InstitutionsController extends AppController
      */
 	public function view($id = null) {
 		$institution = $this->Institutions->getInstitution($id);
-		
+
 		$this->set('institution', $institution);
 		$this->set('_serialize', 'institution');
 	}
 
- 
+
 }
