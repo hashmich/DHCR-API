@@ -54,8 +54,7 @@ use Cake\Utility\Security;
  * the presence of the environment variables like they would be present in production.
  */
 
-// only read the .env file if env::DEBUG is false or not present (likewise in local environments)
-if (filter_var(env('DEBUG', true), FILTER_VALIDATE_BOOLEAN) && file_exists(CONFIG . '.env')) {
+if(!filter_var(env('DHCR_API', false), FILTER_VALIDATE_BOOLEAN) && file_exists(CONFIG . '.env')) {
      $dotenv = new \josegonzalez\Dotenv\Loader([CONFIG . '.env']);
      $dotenv->parse()
          ->putenv()
