@@ -54,7 +54,7 @@ use Cake\Utility\Security;
  * the presence of the environment variables like they would be present in production.
  */
 
-if(!filter_var(env('DHCR_API', false), FILTER_VALIDATE_BOOLEAN) && file_exists(CONFIG . '.env')) {
+if(!filter_var(env('DHCR_ENV', false), FILTER_VALIDATE_BOOLEAN) && file_exists(CONFIG . '.env')) {
      $dotenv = new \josegonzalez\Dotenv\Loader([CONFIG . '.env']);
      $dotenv->parse()
          ->putenv()
