@@ -255,9 +255,9 @@ return [
              * the following line and set the port accordingly
              */
             //'port' => 'non_standard_port_number',
-            'username' => 'my_app',
-            'password' => 'secret',
-            'database' => 'my_app',
+            'username' => env('DB_USER', null),
+            'password' => env('DB_PASS', null),
+            'database' => env('DB_NAME', null),
             /*
              * You do not need to set this flag to use full utf-8 encoding (internal default since CakePHP 3.6).
              */
@@ -274,6 +274,12 @@ return [
              * identifiers quoted when creating SQL. It should be noted that this
              * decreases performance because each query needs to be traversed and
              * manipulated before being executed.
+            'username' => 'my_app',
+            'username' => 'my_app',
+            'password' => 'secret',
+            'database' => 'my_app',
+            'password' => 'secret',
+            'database' => 'my_app',
              */
             'quoteIdentifiers' => false,
 
@@ -286,7 +292,7 @@ return [
              */
             //'init' => ['SET GLOBAL innodb_stats_on_metadata = 0'],
 
-            'url' => env('DATABASE_URL', null),
+            //'url' => env('DATABASE_URL', null),
         ],
 
         /**
@@ -298,16 +304,16 @@ return [
             'persistent' => false,
             'host' => 'localhost',
             //'port' => 'non_standard_port_number',
-            'username' => 'my_app',
-            'password' => 'secret',
-            'database' => 'test_myapp',
+            'username' => env('TEST_DB_USER', null),
+            'password' => env('TEST_DB_PASS', null),
+            'database' => env('TEST_DB_NAME', null),
             //'encoding' => 'utf8mb4',
             'timezone' => 'UTC',
             'cacheMetadata' => true,
             'quoteIdentifiers' => false,
             'log' => false,
             //'init' => ['SET GLOBAL innodb_stats_on_metadata = 0'],
-            'url' => env('DATABASE_TEST_URL', null),
+            //'url' => env('DATABASE_TEST_URL', null),
         ],
     ],
 
