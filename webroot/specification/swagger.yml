@@ -1,294 +1,925 @@
+---
 openapi: 3.0.1
-
 info:
   title: Digital Humanities Course Registry - Data API
-  license:
-    name: CC-BY 4.0
-    url: https://creativecommons.org/licenses/by/4.0/
+  description: |
+    The Digital Humanities Course Registry (DHCR) collects metadata on academic  education programmes, trainings and courses about methods, tools and topics  in the field of the digital humanities.  The overall API output format is JSON.
   termsOfService: https://dhcr.clarin-dariah.eu/pages/info/#imprint
-  description: >
-    The Digital Humanities Course Registry (DHCR) collects metadata on academic 
-    education programmes, trainings and courses about methods, tools and topics 
-    in the field of the digital humanities. 
-    The overall API output format is JSON.
-  version: "1.0"
   contact:
     name: Support
     url: http://dhcr.clarin-dariah.eu/contact/us
-
+  license:
+    name: CC-BY 4.0
+    url: https://creativecommons.org/licenses/by/4.0/
+  version: 1.1
 servers:
-  - url: 'https://dhcr.clarin-dariah.eu/api/v1'
-  - url: 'http://dhcr.clarin-dariah.eu/api/v1'
-
+- url: https://dhcr.clarin-dariah.eu/api/v1
+- url: http://dhcr.clarin-dariah.eu/api/v1
 paths:
   /courses/index:
     get:
-      description: >
-        A call to the index method returns
-        a list of all published course metadata either expired or not.
-        Also courses that have been marked as deleted (soft-delete)
-        will be included. 
-        Default sorting is courses primary identifier, ascending.
+      description: |
+        A call to the index method returns a list of all published course metadata either expired or not. Also courses that have been marked as deleted (soft-delete) will be included.  Default sorting is courses primary identifier, ascending.
       parameters:
-        - $ref: "#/components/parameters/recent"
-        - $ref: "#/components/parameters/online"
-        - $ref: "#/components/parameters/city_id"
-        - $ref: "#/components/parameters/country_id"
-        - $ref: "#/components/parameters/institution_id"
-        - $ref: "#/components/parameters/language_id"
-        - $ref: "#/components/parameters/course_type_id"
-        - $ref: "#/components/parameters/course_parent_type_id"
-        - $ref: "#/components/parameters/discipline_id"
-        - $ref: "#/components/parameters/tadirah_object_id"
-        - $ref: "#/components/parameters/tadirah_technique_id"
-        - $ref: "#/components/parameters/start_date"
-        - $ref: "#/components/parameters/end_date"
-        - $ref: "#/components/parameters/sort"
+      - name: recent
+        in: query
+        description: "Setting this parameter will cause the API  to return only recent, actively maintained, published  and non-deleted data as on the DHCR website.  Parameter may be empty, any parameter value will  be evaluated (boolean) TRUE. \n"
+        required: false
+        allowEmptyValue: true
+        style: form
+        explode: true
+        schema:
+          type: boolean
+          enum:
+          - true
+      - name: online
+        in: query
+        description: "Using this parameter, the registry can be queried for either online courses (true), or on-campus courses (false).  Omitting the parameter or an empty string will result in both types being returned. \n"
+        required: false
+        allowEmptyValue: true
+        style: form
+        explode: true
+        schema:
+          type: boolean
+          enum:
+          - true
+          - false
+      - name: recurring
+        in: query
+        description: "Courses may either be one-off workshops or recurring courses or programmes.  Omitting the parameter or an empty string will result in both types being returned. \n"
+        required: false
+        allowEmptyValue: true
+        style: form
+        explode: true
+        schema:
+          type: boolean
+          enum:
+          - true
+          - false
+      - name: city_id
+        in: query
+        description: One or more city IDs, separated by comma.
+        required: false
+        style: form
+        explode: false
+        schema:
+          type: array
+          items:
+            type: integer
+        examples:
+          oneId:
+            summary: Example of a single city ID
+            value:
+            - 5
+          multipleIds:
+            summary: Example of multiple city IDs
+            value:
+            - 1
+            - 5
+            - 7
+      - name: country_id
+        in: query
+        description: One or more country IDs, separated by comma.
+        required: false
+        style: form
+        explode: false
+        schema:
+          type: array
+          items:
+            type: integer
+        examples:
+          oneId:
+            summary: Example of a single country ID
+            value:
+            - 3
+          multipleIds:
+            summary: Example of multiple country IDs
+            value:
+            - 1
+            - 5
+            - 7
+      - name: institution_id
+        in: query
+        description: One or more institution IDs, separated by comma.
+        required: false
+        style: form
+        explode: false
+        schema:
+          type: array
+          items:
+            type: integer
+        examples:
+          oneId:
+            summary: Example of a single institution ID
+            value:
+            - 20
+          multipleIds:
+            summary: Example of multiple institution IDs
+            value:
+            - 20
+            - 5
+            - 7
+      - name: language_id
+        in: query
+        description: One or more language IDs, separated by comma.
+        required: false
+        style: form
+        explode: false
+        schema:
+          type: array
+          items:
+            type: integer
+        examples:
+          oneId:
+            summary: Example of a single language ID
+            value:
+            - 8
+          multipleIds:
+            summary: Example of multiple language IDs
+            value:
+            - 1
+            - 5
+            - 8
+      - name: course_type_id
+        in: query
+        description: One or more course type IDs, separated by comma.
+        required: false
+        style: form
+        explode: false
+        schema:
+          type: array
+          items:
+            type: integer
+        examples:
+          oneId:
+            summary: Example of a single course type ID
+            value:
+            - 5
+          multipleIds:
+            summary: Example of multiple course type IDs
+            value:
+            - 1
+            - 5
+            - 6
+      - name: course_parent_type_id
+        in: query
+        description: One or more course parent type IDs, separated by comma.
+        required: false
+        style: form
+        explode: false
+        schema:
+          type: array
+          items:
+            type: integer
+        examples:
+          oneId:
+            summary: Example of a single course parent type ID
+            value:
+            - 2
+          multipleIds:
+            summary: Example of multiple course parent type IDs
+            value:
+            - 2
+            - 1
+      - name: discipline_id
+        in: query
+        description: One or more discipline IDs, separated by comma.
+        required: false
+        style: form
+        explode: false
+        schema:
+          type: array
+          items:
+            type: integer
+        examples:
+          oneId:
+            summary: Example of a single discipline ID
+            value:
+            - 5
+          multipleIds:
+            summary: Example of multiple discipline IDs
+            value:
+            - 1
+            - 5
+            - 7
+      - name: tadirah_object_id
+        in: query
+        description: One or more IDs of TaDiRAH objects, separated by comma.
+        required: false
+        style: form
+        explode: false
+        schema:
+          type: array
+          items:
+            type: integer
+        examples:
+          oneId:
+            summary: Example of a single object ID
+            value:
+            - 5
+          multipleIds:
+            summary: Example of multiple object IDs
+            value:
+            - 1
+            - 5
+            - 7
+      - name: tadirah_technique_id
+        in: query
+        description: One or more IDs of TaDiRAH techniques, separated by comma.
+        required: false
+        style: form
+        explode: false
+        schema:
+          type: array
+          items:
+            type: integer
+        examples:
+          oneId:
+            summary: Example of a single technique ID
+            value:
+            - 5
+          multipleIds:
+            summary: Example of multiple technique IDs
+            value:
+            - 1
+            - 5
+            - 7
+      - name: start_date
+        in: query
+        description: Return only courses created after the given date.
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+          format: date
+        example: 2016-10-28
+      - name: end_date
+        in: query
+        description: "Return only courses updated before the given date plus  the expiration period.  Setting both, start_date and end_date, to the same date,  will get you the set of actively  maintained course entries at that date. \n"
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+          format: date
+        example: 2017-10-28
+      - name: sort
+        in: query
+        description: "For the index action, the order of the resulting data can be  modified using the sort parameter.  One has to provide at least a valid field name. The sort direction   is optionally appended and separated by a colon.  Default sort direction is ascending, 'ASC'.  The field name should be preceeded by the CamelCased plural table name, separated with a period.  If omitted, table 'Courses' will be assumed as default.  Invalid field names or from tables not included in the result set will be ignored.  Multiple sorters can be passed separated by comma, in the intended order of evaluation. \n"
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: array
+          items:
+            type: string
+        example:
+          oneSorter:
+            summary: One sort directive
+            value:
+            - Countries.name:ASC
+          multipleSorter:
+            summary: Multiple sort directives
+            value:
+            - Countries.name:ASC
+            - Cities.name:DESC
+            - name
       responses:
-        '200':
-          description: Successful retrieval. 
+        "200":
+          description: Successful retrieval.
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: "#/components/schemas/Course"
+                  $ref: '#/components/schemas/Course'
         default:
-          $ref: "#/components/responses/DefaultError"
-  
+          description: Default error schema for any non-200 http codes
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
   /courses/count:
     get:
-      description: >
-        This operation returns a course count for the given 
-        filter parameters.
-      parameters: 
-        - $ref: "#/components/parameters/recent"
-        - $ref: "#/components/parameters/city_id"
-        - $ref: "#/components/parameters/country_id"
-        - $ref: "#/components/parameters/institution_id"
-        - $ref: "#/components/parameters/language_id"
-        - $ref: "#/components/parameters/course_type_id"
-        - $ref: "#/components/parameters/course_parent_type_id"
-        - $ref: "#/components/parameters/discipline_id"
-        - $ref: "#/components/parameters/tadirah_object_id"
-        - $ref: "#/components/parameters/tadirah_technique_id"
-        - $ref: "#/components/parameters/start_date"
-        - $ref: "#/components/parameters/end_date"
+      description: |
+        This operation returns a course count for the given  filter parameters.
+      parameters:
+      - name: recent
+        in: query
+        description: "Setting this parameter will cause the API  to return only recent, actively maintained, published  and non-deleted data as on the DHCR website.  Parameter may be empty, any parameter value will  be evaluated (boolean) TRUE. \n"
+        required: false
+        allowEmptyValue: true
+        style: form
+        explode: true
+        schema:
+          type: boolean
+          enum:
+          - true
+      - name: city_id
+        in: query
+        description: One or more city IDs, separated by comma.
+        required: false
+        style: form
+        explode: false
+        schema:
+          type: array
+          items:
+            type: integer
+        examples:
+          oneId:
+            summary: Example of a single city ID
+            value:
+            - 5
+          multipleIds:
+            summary: Example of multiple city IDs
+            value:
+            - 1
+            - 5
+            - 7
+      - name: country_id
+        in: query
+        description: One or more country IDs, separated by comma.
+        required: false
+        style: form
+        explode: false
+        schema:
+          type: array
+          items:
+            type: integer
+        examples:
+          oneId:
+            summary: Example of a single country ID
+            value:
+            - 3
+          multipleIds:
+            summary: Example of multiple country IDs
+            value:
+            - 1
+            - 5
+            - 7
+      - name: institution_id
+        in: query
+        description: One or more institution IDs, separated by comma.
+        required: false
+        style: form
+        explode: false
+        schema:
+          type: array
+          items:
+            type: integer
+        examples:
+          oneId:
+            summary: Example of a single institution ID
+            value:
+            - 20
+          multipleIds:
+            summary: Example of multiple institution IDs
+            value:
+            - 20
+            - 5
+            - 7
+      - name: language_id
+        in: query
+        description: One or more language IDs, separated by comma.
+        required: false
+        style: form
+        explode: false
+        schema:
+          type: array
+          items:
+            type: integer
+        examples:
+          oneId:
+            summary: Example of a single language ID
+            value:
+            - 8
+          multipleIds:
+            summary: Example of multiple language IDs
+            value:
+            - 1
+            - 5
+            - 8
+      - name: course_type_id
+        in: query
+        description: One or more course type IDs, separated by comma.
+        required: false
+        style: form
+        explode: false
+        schema:
+          type: array
+          items:
+            type: integer
+        examples:
+          oneId:
+            summary: Example of a single course type ID
+            value:
+            - 5
+          multipleIds:
+            summary: Example of multiple course type IDs
+            value:
+            - 1
+            - 5
+            - 6
+      - name: course_parent_type_id
+        in: query
+        description: One or more course parent type IDs, separated by comma.
+        required: false
+        style: form
+        explode: false
+        schema:
+          type: array
+          items:
+            type: integer
+        examples:
+          oneId:
+            summary: Example of a single course parent type ID
+            value:
+            - 2
+          multipleIds:
+            summary: Example of multiple course parent type IDs
+            value:
+            - 2
+            - 1
+      - name: discipline_id
+        in: query
+        description: One or more discipline IDs, separated by comma.
+        required: false
+        style: form
+        explode: false
+        schema:
+          type: array
+          items:
+            type: integer
+        examples:
+          oneId:
+            summary: Example of a single discipline ID
+            value:
+            - 5
+          multipleIds:
+            summary: Example of multiple discipline IDs
+            value:
+            - 1
+            - 5
+            - 7
+      - name: tadirah_object_id
+        in: query
+        description: One or more IDs of TaDiRAH objects, separated by comma.
+        required: false
+        style: form
+        explode: false
+        schema:
+          type: array
+          items:
+            type: integer
+        examples:
+          oneId:
+            summary: Example of a single object ID
+            value:
+            - 5
+          multipleIds:
+            summary: Example of multiple object IDs
+            value:
+            - 1
+            - 5
+            - 7
+      - name: tadirah_technique_id
+        in: query
+        description: One or more IDs of TaDiRAH techniques, separated by comma.
+        required: false
+        style: form
+        explode: false
+        schema:
+          type: array
+          items:
+            type: integer
+        examples:
+          oneId:
+            summary: Example of a single technique ID
+            value:
+            - 5
+          multipleIds:
+            summary: Example of multiple technique IDs
+            value:
+            - 1
+            - 5
+            - 7
+      - name: start_date
+        in: query
+        description: Return only courses created after the given date.
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+          format: date
+        example: 2016-10-28
+      - name: end_date
+        in: query
+        description: "Return only courses updated before the given date plus  the expiration period.  Setting both, start_date and end_date, to the same date,  will get you the set of actively  maintained course entries at that date. \n"
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+          format: date
+        example: 2017-10-28
       responses:
-        '200': 
+        "200":
           description: Success
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Count"
+                $ref: '#/components/schemas/Count'
         default:
-          $ref: "#/components/responses/DefaultError"
-  
+          description: Default error schema for any non-200 http codes
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
   /courses/view/{courseId}:
     get:
-      description: >
-        The course view operation returns a single course data set, 
-        determined by its identifier. 
+      description: "The course view operation returns a single course data set,  determined by its identifier. \n"
       parameters:
-        - in: path
-          name: courseId
-          required: true
-          schema:
-            type: integer
+      - name: courseId
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: integer
       responses:
-        '200':
-          description: Successful retrieval. 
+        "200":
+          description: Successful retrieval.
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Course"
-        '404':
-          $ref: "#/components/responses/NotFoundError"
+                $ref: '#/components/schemas/Course'
+        "404":
+          description: The specified resource could not be found.
+          content:
+            application/json:
+              schema:
+                properties:
+                  code:
+                    type: string
+                    example: 404
+                  message:
+                    type: string
+                    example: Record not found in table.
+                  url:
+                    type: string
+                    example: https://dhcr.api.clarin-dariah.eu/v1/courses/view/4711
         default:
-          $ref: "#/components/responses/DefaultError"
-
+          description: Default error schema for any non-200 http codes
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
   /countries/index:
     get:
-      description: >
+      description: |
         Returns a list of all available countries from the database.
       parameters:
-        - $ref: '#/components/parameters/course_count'
-        - $ref: '#/components/parameters/sort_count'
+      - name: course_count
+        in: query
+        description: "Setting this flag will append a count of matching courses to  the resulting data set. \n"
+        required: false
+        allowEmptyValue: true
+        style: form
+        explode: true
+        schema:
+          type: boolean
+          enum:
+          - true
+      - name: sort_count
+        in: query
+        description: "Setting this flag will sort the result set by matching courses descending. \n"
+        required: false
+        allowEmptyValue: true
+        style: form
+        explode: true
+        schema:
+          type: boolean
+          enum:
+          - true
       responses:
-        '200':
-          description: Successful retrieval. 
+        "200":
+          description: Successful retrieval.
           content:
             application/json:
               schema:
                 type: array
                 items:
+                  required:
+                  - id
+                  - name
                   type: object
                   allOf:
-                    - $ref: "#/components/schemas/Country"
-                    - $ref: "#/components/schemas/Count"
-                  required: 
-                    - id 
-                    - name
+                  - $ref: '#/components/schemas/Country'
+                  - $ref: '#/components/schemas/Count'
         default:
-          $ref: "#/components/responses/DefaultError"
-  
+          description: Default error schema for any non-200 http codes
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
   /countries/view/{countryId}:
     get:
-      description: >
+      description: |
         Returns a country entry from the database.
       parameters:
-        - in: path
-          name: countryId
-          required: true
-          schema:
-            type: integer
+      - name: countryId
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: integer
       responses:
-        '200':
-          description: Successful retrieval. 
+        "200":
+          description: Successful retrieval.
           content:
             application/json:
               schema:
+                required:
+                - course_count
+                - id
+                - name
                 type: object
                 allOf:
-                  - $ref: "#/components/schemas/Country"
-                  - $ref: "#/components/schemas/Count"
-                required: 
-                    - course_count
-                    - id
-                    - name
+                - $ref: '#/components/schemas/Country'
+                - $ref: '#/components/schemas/Count'
         default:
-          $ref: "#/components/responses/DefaultError"
-  
+          description: Default error schema for any non-200 http codes
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
   /cities/index:
     get:
-      description: >
+      description: |
         Returns a list of all available cities from the database.
       parameters:
-        - $ref: '#/components/parameters/course_count'
-        - $ref: '#/components/parameters/sort_count'
-        - $ref: '#/components/parameters/country_id'
-        - $ref: '#/components/parameters/group'
+      - name: course_count
+        in: query
+        description: "Setting this flag will append a count of matching courses to  the resulting data set. \n"
+        required: false
+        allowEmptyValue: true
+        style: form
+        explode: true
+        schema:
+          type: boolean
+          enum:
+          - true
+      - name: sort_count
+        in: query
+        description: "Setting this flag will sort the result set by matching courses descending. \n"
+        required: false
+        allowEmptyValue: true
+        style: form
+        explode: true
+        schema:
+          type: boolean
+          enum:
+          - true
+      - name: country_id
+        in: query
+        description: One or more country IDs, separated by comma.
+        required: false
+        style: form
+        explode: false
+        schema:
+          type: array
+          items:
+            type: integer
+        examples:
+          oneId:
+            summary: Example of a single country ID
+            value:
+            - 3
+          multipleIds:
+            summary: Example of multiple country IDs
+            value:
+            - 1
+            - 5
+            - 7
+      - name: group
+        in: query
+        description: "Setting this parameter will change the structure of returned  data for cities and institutions.  The result is turned into an object grouping entries by country names as the object properties.  Parameter may be empty, any parameter value will  be evaluated (boolean) TRUE. \n"
+        required: false
+        allowEmptyValue: true
+        style: form
+        explode: true
+        schema:
+          type: boolean
+          enum:
+          - true
       responses:
-        '200':
-          description: Successful retrieval. 
+        "200":
+          description: Successful retrieval.
           content:
             application/json:
               schema:
                 type: array
                 items:
                   type: object
-                  allOf:
-                    - $ref: "#/components/schemas/City"
-                    - $ref: "#/components/schemas/Count"
                   properties:
-                    country: 
-                      $ref: "#/components/schemas/Country"
+                    country:
+                      $ref: '#/components/schemas/Country'
+                  allOf:
+                  - $ref: '#/components/schemas/City'
+                  - $ref: '#/components/schemas/Count'
         default:
-          $ref: "#/components/responses/DefaultError"
-  
+          description: Default error schema for any non-200 http codes
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
   /cities/view/{cityId}:
     get:
-      description: >
+      description: |
         Returns a city entry from the database.
       parameters:
-        - in: path
-          name: cityId
-          required: true
-          schema:
-            type: integer
+      - name: cityId
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: integer
       responses:
-        '200':
-          description: Successful retrieval. 
+        "200":
+          description: Successful retrieval.
           content:
             application/json:
               schema:
+                required:
+                - country
+                - course_count
+                - id
+                - name
                 type: object
-                allOf:
-                  - $ref: "#/components/schemas/City"
-                  - $ref: "#/components/schemas/Count"
                 properties:
-                    country: 
-                      $ref: "#/components/schemas/Country"
-                required: 
-                    - course_count
-                    - id
-                    - name
-                    - country
+                  country:
+                    $ref: '#/components/schemas/Country'
+                allOf:
+                - $ref: '#/components/schemas/City'
+                - $ref: '#/components/schemas/Count'
         default:
-          $ref: "#/components/responses/DefaultError"
-  
+          description: Default error schema for any non-200 http codes
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
   /institutions/index:
     get:
-      description: >
-        Returns a list of all available institutions from the database.
-        If the city_id parameter is set, the country_id parameter will be ignored. 
+      description: "Returns a list of all available institutions from the database. If the city_id parameter is set, the country_id parameter will be ignored. \n"
       parameters:
-        - $ref: '#/components/parameters/course_count'
-        - $ref: '#/components/parameters/sort_count'
-        - $ref: '#/components/parameters/country_id'
-        - $ref: '#/components/parameters/city_id'
-        - $ref: '#/components/parameters/group'
+      - name: course_count
+        in: query
+        description: "Setting this flag will append a count of matching courses to  the resulting data set. \n"
+        required: false
+        allowEmptyValue: true
+        style: form
+        explode: true
+        schema:
+          type: boolean
+          enum:
+          - true
+      - name: sort_count
+        in: query
+        description: "Setting this flag will sort the result set by matching courses descending. \n"
+        required: false
+        allowEmptyValue: true
+        style: form
+        explode: true
+        schema:
+          type: boolean
+          enum:
+          - true
+      - name: country_id
+        in: query
+        description: One or more country IDs, separated by comma.
+        required: false
+        style: form
+        explode: false
+        schema:
+          type: array
+          items:
+            type: integer
+        examples:
+          oneId:
+            summary: Example of a single country ID
+            value:
+            - 3
+          multipleIds:
+            summary: Example of multiple country IDs
+            value:
+            - 1
+            - 5
+            - 7
+      - name: city_id
+        in: query
+        description: One or more city IDs, separated by comma.
+        required: false
+        style: form
+        explode: false
+        schema:
+          type: array
+          items:
+            type: integer
+        examples:
+          oneId:
+            summary: Example of a single city ID
+            value:
+            - 5
+          multipleIds:
+            summary: Example of multiple city IDs
+            value:
+            - 1
+            - 5
+            - 7
+      - name: group
+        in: query
+        description: "Setting this parameter will change the structure of returned  data for cities and institutions.  The result is turned into an object grouping entries by country names as the object properties.  Parameter may be empty, any parameter value will  be evaluated (boolean) TRUE. \n"
+        required: false
+        allowEmptyValue: true
+        style: form
+        explode: true
+        schema:
+          type: boolean
+          enum:
+          - true
       responses:
-        '200':
-          description: Successful retrieval. 
+        "200":
+          description: Successful retrieval.
           content:
             application/json:
               schema:
                 type: array
                 items:
                   type: object
-                  allOf:
-                    - $ref: "#/components/schemas/Institution"
-                    - $ref: "#/components/schemas/Count"
                   properties:
-                    country: 
-                      $ref: "#/components/schemas/Country"
-                    city: 
-                      $ref: "#/components/schemas/City"
+                    country:
+                      $ref: '#/components/schemas/Country'
+                    city:
+                      $ref: '#/components/schemas/City'
+                  allOf:
+                  - $ref: '#/components/schemas/Institution'
+                  - $ref: '#/components/schemas/Count'
         default:
-          $ref: "#/components/responses/DefaultError"
-  
+          description: Default error schema for any non-200 http codes
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
   /institutions/view/{institutionId}:
     get:
-      description: >
+      description: |
         Returns an institution entry from the database.
       parameters:
-        - in: path
-          name: institutionId
-          required: true
-          schema:
-            type: integer
+      - name: institutionId
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: integer
       responses:
-        '200':
-          description: Successful retrieval. 
+        "200":
+          description: Successful retrieval.
           content:
             application/json:
               schema:
+                required:
+                - city
+                - country
+                - course_count
+                - id
+                - name
                 type: object
-                allOf:
-                  - $ref: "#/components/schemas/Institution"
-                  - $ref: "#/components/schemas/Count"
                 properties:
-                    country: 
-                      $ref: "#/components/schemas/Country"
-                    city: 
-                      $ref: "#/components/schemas/City"
-                required: 
-                    - course_count
-                    - id
-                    - name
-                    - country
-                    - city
+                  country:
+                    $ref: '#/components/schemas/Country'
+                  city:
+                    $ref: '#/components/schemas/City'
+                allOf:
+                - $ref: '#/components/schemas/Institution'
+                - $ref: '#/components/schemas/Count'
         default:
-          $ref: "#/components/responses/DefaultError"
-  
+          description: Default error schema for any non-200 http codes
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
   /course_duration_units/index:
     get:
-      description: >
+      description: |
         Returns a list of course duration units from the database.
       responses:
-        '200':
-          description: Successful retrieval. 
+        "200":
+          description: Successful retrieval.
           content:
             application/json:
               schema:
@@ -296,42 +927,50 @@ paths:
                 items:
                   type: object
                   allOf:
-                    - $ref: "#/components/schemas/CourseDurationUnit"
+                  - $ref: '#/components/schemas/CourseDurationUnit'
         default:
-          $ref: "#/components/responses/DefaultError"
-  
+          description: Default error schema for any non-200 http codes
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
   /course_duration_units/view/{courseDurationUnitId}:
     get:
-      description: >
+      description: |
         Returns one entry from the database.
       parameters:
-        - in: path
-          name: courseDurationUnitId
-          required: true
-          schema:
-            type: integer
+      - name: courseDurationUnitId
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: integer
       responses:
-        '200':
-          description: Successful retrieval. 
+        "200":
+          description: Successful retrieval.
           content:
             application/json:
               schema:
+                required:
+                - id
+                - name
                 type: object
                 allOf:
-                  - $ref: "#/components/schemas/CourseDurationUnit"
-                required: 
-                    - id
-                    - name
+                - $ref: '#/components/schemas/CourseDurationUnit'
         default:
-          $ref: "#/components/responses/DefaultError"
-  
+          description: Default error schema for any non-200 http codes
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
   /deletion_reasons/index:
     get:
-      description: >
+      description: |
         Returns a list of reasons from the database.
       responses:
-        '200':
-          description: Successful retrieval. 
+        "200":
+          description: Successful retrieval.
           content:
             application/json:
               schema:
@@ -339,648 +978,525 @@ paths:
                 items:
                   type: object
                   allOf:
-                    - $ref: "#/components/schemas/DeletionReason"
+                  - $ref: '#/components/schemas/DeletionReason'
         default:
-          $ref: "#/components/responses/DefaultError"
-  
+          description: Default error schema for any non-200 http codes
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
   /deletion_reasons/view/{deletionReasonId}:
     get:
-      description: >
+      description: |
         Returns one reason from the database.
       parameters:
-        - in: path
-          name: deletionReasonId
-          required: true
-          schema:
-            type: integer
+      - name: deletionReasonId
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: integer
       responses:
-        '200':
-          description: Successful retrieval. 
+        "200":
+          description: Successful retrieval.
           content:
             application/json:
               schema:
+                required:
+                - id
+                - name
                 type: object
                 allOf:
-                  - $ref: "#/components/schemas/DeletionReason"
-                required: 
-                    - id
-                    - name
+                - $ref: '#/components/schemas/DeletionReason'
         default:
-          $ref: "#/components/responses/DefaultError"
-  
+          description: Default error schema for any non-200 http codes
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
   /languages/index:
     get:
-      description: >
+      description: |
         Returns a list of available languages from the database.
       parameters:
-        - $ref: '#/components/parameters/course_count'
-        - $ref: '#/components/parameters/sort_count'
+      - name: course_count
+        in: query
+        description: "Setting this flag will append a count of matching courses to  the resulting data set. \n"
+        required: false
+        allowEmptyValue: true
+        style: form
+        explode: true
+        schema:
+          type: boolean
+          enum:
+          - true
+      - name: sort_count
+        in: query
+        description: "Setting this flag will sort the result set by matching courses descending. \n"
+        required: false
+        allowEmptyValue: true
+        style: form
+        explode: true
+        schema:
+          type: boolean
+          enum:
+          - true
       responses:
-        '200':
-          description: Successful retrieval. 
+        "200":
+          description: Successful retrieval.
           content:
             application/json:
               schema:
                 type: array
                 items:
+                  required:
+                  - id
+                  - name
                   type: object
                   allOf:
-                    - $ref: "#/components/schemas/Language"
-                    - $ref: "#/components/schemas/Count"
-                  required: 
-                    - id
-                    - name
+                  - $ref: '#/components/schemas/Language'
+                  - $ref: '#/components/schemas/Count'
         default:
-          $ref: "#/components/responses/DefaultError"
-  
+          description: Default error schema for any non-200 http codes
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
   /languages/view/{languageId}:
     get:
-      description: >
+      description: |
         Returns a language entry from the database.
       parameters:
-        - in: path
-          name: languageId
-          required: true
-          schema:
-            type: integer
+      - name: languageId
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: integer
       responses:
-        '200':
-          description: Successful retrieval. 
+        "200":
+          description: Successful retrieval.
           content:
             application/json:
               schema:
+                required:
+                - course_count
+                - id - name
                 type: object
                 allOf:
-                  - $ref: "#/components/schemas/Language"
-                  - $ref: "#/components/schemas/Count"
-                required: 
-                  - course_count
-                  - id
-                    - name
+                - $ref: '#/components/schemas/Language'
+                - $ref: '#/components/schemas/Count'
         default:
-          $ref: "#/components/responses/DefaultError"
-  
+          description: Default error schema for any non-200 http codes
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
   /course_types/index:
     get:
-      description: >
+      description: |
         Returns a list of available course types from the database.
       parameters:
-        - $ref: '#/components/parameters/course_count'
-        - $ref: '#/components/parameters/sort_count'
+      - name: course_count
+        in: query
+        description: "Setting this flag will append a count of matching courses to  the resulting data set. \n"
+        required: false
+        allowEmptyValue: true
+        style: form
+        explode: true
+        schema:
+          type: boolean
+          enum:
+          - true
+      - name: sort_count
+        in: query
+        description: "Setting this flag will sort the result set by matching courses descending. \n"
+        required: false
+        allowEmptyValue: true
+        style: form
+        explode: true
+        schema:
+          type: boolean
+          enum:
+          - true
       responses:
-        '200':
-          description: Successful retrieval. 
+        "200":
+          description: Successful retrieval.
           content:
             application/json:
               schema:
                 type: array
                 items:
+                  required:
+                  - id
+                  - name
                   type: object
                   allOf:
-                    - $ref: "#/components/schemas/CourseType"
-                    - $ref: "#/components/schemas/Count"
-                  required: 
-                    - id
-                    - name
+                  - $ref: '#/components/schemas/CourseType'
+                  - $ref: '#/components/schemas/Count'
         default:
-          $ref: "#/components/responses/DefaultError"
-  
+          description: Default error schema for any non-200 http codes
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
   /course_types/view/{courseTypeId}:
     get:
-      description: >
+      description: |
         Returns a course type entry from the database.
       parameters:
-        - in: path
-          name: courseTypeId
-          required: true
-          schema:
-            type: integer
+      - name: courseTypeId
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: integer
       responses:
-        '200':
-          description: Successful retrieval. 
+        "200":
+          description: Successful retrieval.
           content:
             application/json:
               schema:
+                required:
+                - course_count
+                - course_parent_type_id
+                - full_name
+                - id
+                - name
                 type: object
                 allOf:
-                  - $ref: "#/components/schemas/CourseType"
-                  - $ref: "#/components/schemas/Count"
-                required: 
-                    - course_count
-                    - id
-                    - name
-                    - course_parent_type_id
-                    - full_name
+                - $ref: '#/components/schemas/CourseType'
+                - $ref: '#/components/schemas/Count'
         default:
-          $ref: "#/components/responses/DefaultError"
-  
+          description: Default error schema for any non-200 http codes
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
   /course_parent_types/index:
     get:
-      description: >
+      description: |
         Returns a list of parent course types from the database.
       parameters:
-        - $ref: '#/components/parameters/course_count'
-        - $ref: '#/components/parameters/sort_count'
+      - name: course_count
+        in: query
+        description: "Setting this flag will append a count of matching courses to  the resulting data set. \n"
+        required: false
+        allowEmptyValue: true
+        style: form
+        explode: true
+        schema:
+          type: boolean
+          enum:
+          - true
+      - name: sort_count
+        in: query
+        description: "Setting this flag will sort the result set by matching courses descending. \n"
+        required: false
+        allowEmptyValue: true
+        style: form
+        explode: true
+        schema:
+          type: boolean
+          enum:
+          - true
       responses:
-        '200':
-          description: Successful retrieval. 
+        "200":
+          description: Successful retrieval.
           content:
             application/json:
               schema:
                 type: array
                 items:
+                  required:
+                  - id
+                  - name
                   type: object
                   allOf:
-                    - $ref: "#/components/schemas/CourseParentType"
-                    - $ref: "#/components/schemas/Count"
-                  required: 
-                    - id
-                    - name
+                  - $ref: '#/components/schemas/CourseParentType'
+                  - $ref: '#/components/schemas/Count'
         default:
-          $ref: "#/components/responses/DefaultError"
-  
+          description: Default error schema for any non-200 http codes
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
   /course_parent_types/view/{courseParentTypeId}:
     get:
-      description: >
+      description: |
         Returns a parent type entry from the database.
       parameters:
-        - in: path
-          name: courseParentTypeId
-          required: true
-          schema:
-            type: integer
+      - name: courseParentTypeId
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: integer
       responses:
-        '200':
-          description: Successful retrieval. 
+        "200":
+          description: Successful retrieval.
           content:
             application/json:
               schema:
+                required:
+                - course_count
+                - id
+                - name
                 type: object
                 allOf:
-                  - $ref: "#/components/schemas/CourseParentType"
-                  - $ref: "#/components/schemas/Count"
-                required: 
-                    - course_count
-                    - id
-                    - name
+                - $ref: '#/components/schemas/CourseParentType'
+                - $ref: '#/components/schemas/Count'
         default:
-          $ref: "#/components/responses/DefaultError"
-  
+          description: Default error schema for any non-200 http codes
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
   /disciplines/index:
     get:
-      description: >
+      description: |
         Returns a list of available disciplines from the database.
       parameters:
-        - $ref: '#/components/parameters/course_count'
-        - $ref: '#/components/parameters/sort_count'
+      - name: course_count
+        in: query
+        description: "Setting this flag will append a count of matching courses to  the resulting data set. \n"
+        required: false
+        allowEmptyValue: true
+        style: form
+        explode: true
+        schema:
+          type: boolean
+          enum:
+          - true
+      - name: sort_count
+        in: query
+        description: "Setting this flag will sort the result set by matching courses descending. \n"
+        required: false
+        allowEmptyValue: true
+        style: form
+        explode: true
+        schema:
+          type: boolean
+          enum:
+          - true
       responses:
-        '200':
-          description: Successful retrieval. 
+        "200":
+          description: Successful retrieval.
           content:
             application/json:
               schema:
                 type: array
                 items:
+                  required:
+                  - id
+                  - name
                   type: object
                   allOf:
-                    - $ref: "#/components/schemas/Discipline"
-                    - $ref: "#/components/schemas/Count"
-                  required: 
-                    - id 
-                    - name
+                  - $ref: '#/components/schemas/Discipline'
+                  - $ref: '#/components/schemas/Count'
         default:
-          $ref: "#/components/responses/DefaultError"
-  
+          description: Default error schema for any non-200 http codes
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
   /disciplines/view/{disciplineId}:
     get:
-      description: >
+      description: |
         Returns a discipline entry from the database.
       parameters:
-        - in: path
-          name: disciplineId
-          required: true
-          schema:
-            type: integer
+      - name: disciplineId
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: integer
       responses:
-        '200':
-          description: Successful retrieval. 
+        "200":
+          description: Successful retrieval.
           content:
             application/json:
               schema:
+                required:
+                - course_count
+                - id
+                - name
                 type: object
                 allOf:
-                  - $ref: "#/components/schemas/Discipline"
-                  - $ref: "#/components/schemas/Count"
-                required: 
-                    - course_count
-                    - id
-                    - name
+                - $ref: '#/components/schemas/Discipline'
+                - $ref: '#/components/schemas/Count'
         default:
-          $ref: "#/components/responses/DefaultError"
-  
+          description: Default error schema for any non-200 http codes
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
   /tadirah_objects/index:
     get:
-      description: >
+      description: |
         Returns a list of available TaDiRAH objects from the database.
       parameters:
-        - $ref: '#/components/parameters/course_count'
-        - $ref: '#/components/parameters/sort_count'
+      - name: course_count
+        in: query
+        description: "Setting this flag will append a count of matching courses to  the resulting data set. \n"
+        required: false
+        allowEmptyValue: true
+        style: form
+        explode: true
+        schema:
+          type: boolean
+          enum:
+          - true
+      - name: sort_count
+        in: query
+        description: "Setting this flag will sort the result set by matching courses descending. \n"
+        required: false
+        allowEmptyValue: true
+        style: form
+        explode: true
+        schema:
+          type: boolean
+          enum:
+          - true
       responses:
-        '200':
-          description: Successful retrieval. 
+        "200":
+          description: Successful retrieval.
           content:
             application/json:
               schema:
                 type: array
                 items:
+                  required:
+                  - id
+                  - name
                   type: object
                   allOf:
-                    - $ref: "#/components/schemas/TadirahObject"
-                    - $ref: "#/components/schemas/Count"
-                  required: 
-                    - id 
-                    - name
+                  - $ref: '#/components/schemas/TadirahObject'
+                  - $ref: '#/components/schemas/Count'
         default:
-          $ref: "#/components/responses/DefaultError"
-  
+          description: Default error schema for any non-200 http codes
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
   /tadirah_objects/view/{tadirahObjectId}:
     get:
-      description: >
+      description: |
         Returns a TaDiRAH object entry from the database.
       parameters:
-        - in: path
-          name: tadirahObjectId
-          required: true
-          schema:
-            type: integer
+      - name: tadirahObjectId
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: integer
       responses:
-        '200':
-          description: Successful retrieval. 
+        "200":
+          description: Successful retrieval.
           content:
             application/json:
               schema:
+                required:
+                - course_count
+                - id
+                - name
                 type: object
                 allOf:
-                  - $ref: "#/components/schemas/TadirahObject"
-                  - $ref: "#/components/schemas/Count"
-                required: 
-                    - course_count
-                    - id
-                    - name
+                - $ref: '#/components/schemas/TadirahObject'
+                - $ref: '#/components/schemas/Count'
         default:
-          $ref: "#/components/responses/DefaultError"
-  
+          description: Default error schema for any non-200 http codes
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
   /tadirah_techniques/index:
     get:
-      description: >
+      description: |
         Returns a list of available TaDiRAH techniques the database.
       parameters:
-        - $ref: '#/components/parameters/course_count'
-        - $ref: '#/components/parameters/sort_count'
+      - name: course_count
+        in: query
+        description: "Setting this flag will append a count of matching courses to  the resulting data set. \n"
+        required: false
+        allowEmptyValue: true
+        style: form
+        explode: true
+        schema:
+          type: boolean
+          enum:
+          - true
+      - name: sort_count
+        in: query
+        description: "Setting this flag will sort the result set by matching courses descending. \n"
+        required: false
+        allowEmptyValue: true
+        style: form
+        explode: true
+        schema:
+          type: boolean
+          enum:
+          - true
       responses:
-        '200':
-          description: Successful retrieval. 
+        "200":
+          description: Successful retrieval.
           content:
             application/json:
               schema:
                 type: array
                 items:
+                  required:
+                  - id
+                  - name
                   type: object
                   allOf:
-                    - $ref: "#/components/schemas/TadirahTechnique"
-                    - $ref: "#/components/schemas/Count"
-                  required: 
-                    - id 
-                    - name
+                  - $ref: '#/components/schemas/TadirahTechnique'
+                  - $ref: '#/components/schemas/Count'
         default:
-          $ref: "#/components/responses/DefaultError"
-  
-  /tadirah_techniques/view/{tadirahTechniqueId}:
-    get:
-      description: >
-        Returns a TaDiRAH technique entry from the database.
-      parameters:
-        - in: path
-          name: tadirahTechniqueId
-          required: true
-          schema:
-            type: integer
-      responses:
-        '200':
-          description: Successful retrieval. 
+          description: Default error schema for any non-200 http codes
           content:
             application/json:
               schema:
+                $ref: '#/components/schemas/Error'
+  /tadirah_techniques/view/{tadirahTechniqueId}:
+    get:
+      description: |
+        Returns a TaDiRAH technique entry from the database.
+      parameters:
+      - name: tadirahTechniqueId
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: integer
+      responses:
+        "200":
+          description: Successful retrieval.
+          content:
+            application/json:
+              schema:
+                required:
+                - course_count
+                - id
+                - name
                 type: object
                 allOf:
-                  - $ref: "#/components/schemas/TadirahTechnique"
-                  - $ref: "#/components/schemas/Count"
-                required: 
-                    - course_count
-                    - id
-                    - name
+                - $ref: '#/components/schemas/TadirahTechnique'
+                - $ref: '#/components/schemas/Count'
         default:
-          $ref: "#/components/responses/DefaultError"
-  
-
+          description: Default error schema for any non-200 http codes
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
 components:
-  parameters:
-    course_count:
-      in: query
-      name: course_count
-      description: >
-        Setting this flag will append a count of matching courses to 
-        the resulting data set. 
-      schema:
-        type: boolean
-        enum:
-          - true
-      allowEmptyValue: true
-    sort_count:
-      in: query
-      name: sort_count
-      description: >
-        Setting this flag will sort the result set by matching courses
-        descending. 
-      schema:
-        type: boolean
-        enum:
-          - true
-      allowEmptyValue: true
-    recent:
-      in: query
-      name: recent
-      description: >
-        Setting this parameter will cause the API 
-        to return only recent, actively maintained, published 
-        and non-deleted data as on the DHCR website. 
-        Parameter may be empty, any parameter value will 
-        be evaluated (boolean) TRUE. 
-      schema:
-        type: boolean
-        enum:
-          - true
-      allowEmptyValue: true
-    online:
-      in: query
-      name: online
-      description: >
-        Using this parameter, the registry can be queried for either online
-        courses (true), or on-campus courses (false). 
-        Omitting the parameter or an empty string will result in both types being returned. 
-      schema: 
-        type: boolean
-        enum:
-          - true
-          - false
-      allowEmptyValue: true
-    recurring:
-      in: query
-      name: recurring
-      description: >
-        Courses may either be one-off workshops or recurring courses or programmes. 
-        Omitting the parameter or an empty string will result in both types being returned. 
-      schema: 
-        type: boolean
-        enum:
-          - true
-          - false
-      allowEmptyValue: true
-    group:
-      in: query
-      name: group
-      description: >
-        Setting this parameter will change the structure of returned 
-        data for cities and institutions. 
-        The result is turned into an object grouping entries by country names
-        as the object properties. 
-        Parameter may be empty, any parameter value will 
-        be evaluated (boolean) TRUE. 
-      schema:
-        type: boolean
-        enum:
-          - true
-      allowEmptyValue: true
-    city_id:
-      in: query
-      name: city_id
-      description: One or more city IDs
-      schema:
-        type: array
-        items:
-          type: integer
-      style: form
-      explode: false
-      examples:
-        oneId:
-          summary: Example of a single city ID
-          value: [5]   # ?ids=5
-        multipleIds:
-          summary: Example of multiple city IDs
-          value: [1, 5, 7]   # ?ids=1,5,7
-    country_id:
-      in: query
-      name: country_id
-      description: One or more country IDs
-      schema:
-        type: array
-        items:
-          type: integer
-      style: form
-      explode: false
-      examples:
-        oneId:
-          summary: Example of a single country ID
-          value: [3]   # ?ids=5
-        multipleIds:
-          summary: Example of multiple country IDs
-          value: [1, 5, 7]   # ?ids=1,5,7
-    institution_id:
-      in: query
-      name: institution_id
-      description: One or more institution IDs
-      schema:
-        type: array
-        items:
-          type: integer
-      style: form
-      explode: false
-      examples:
-        oneId:
-          summary: Example of a single institution ID
-          value: [20]   # ?ids=5
-        multipleIds:
-          summary: Example of multiple institution IDs
-          value: [20, 5, 7]   # ?ids=1,5,7
-    language_id:
-      in: query
-      name: language_id
-      description: One or more language IDs
-      schema:
-        type: array
-        items:
-          type: integer
-      style: form
-      explode: false
-      examples:
-        oneId:
-          summary: Example of a single language ID
-          value: [8]   # ?ids=5
-        multipleIds:
-          summary: Example of multiple language IDs
-          value: [1, 5, 8]   # ?ids=1,5,7
-    course_type_id:
-      in: query
-      name: course_type_id
-      description: One or more course type IDs
-      schema:
-        type: array
-        items:
-          type: integer
-      style: form
-      explode: false
-      examples:
-        oneId:
-          summary: Example of a single course type ID
-          value: [5]   # ?ids=5
-        multipleIds:
-          summary: Example of multiple course type IDs
-          value: [1, 5, 6]   # ?ids=1,5,7
-    course_parent_type_id:    
-      in: query
-      name: course_parent_type_id
-      description: One or more course parent type IDs
-      schema:
-        type: array
-        items:
-          type: integer
-      style: form
-      explode: false
-      examples:
-        oneId:
-          summary: Example of a single course parent type ID
-          value: [2]
-        multipleIds:
-          summary: Example of multiple course parent type IDs
-          value: [2, 1]
-    tadirah_object_id:
-      in: query
-      name: tadirah_object_id
-      description: One or more IDs of TaDiRAH objects
-      schema:
-        type: array
-        items:
-          type: integer
-      style: form
-      explode: false
-      examples:
-        oneId:
-          summary: Example of a single object ID
-          value: [5]   # ?ids=5
-        multipleIds:
-          summary: Example of multiple object IDs
-          value: [1, 5, 7]   # ?ids=1,5,7
-    tadirah_technique_id:
-      in: query
-      name: tadirah_technique_id
-      description: One or more IDs of TaDiRAH techniques
-      schema:
-        type: array
-        items:
-          type: integer
-      style: form
-      explode: false
-      examples:
-        oneId:
-          summary: Example of a single technique ID
-          value: [5]   # ?ids=5
-        multipleIds:
-          summary: Example of multiple technique IDs
-          value: [1, 5, 7]   # ?ids=1,5,7
-    discipline_id:
-      in: query
-      name: discipline_id
-      description: One or more discipline IDs
-      schema:
-        type: array
-        items:
-          type: integer
-      style: form
-      explode: false
-      examples:
-        oneId:
-          summary: Example of a single discipline ID
-          value: [5]   # ?ids=5
-        multipleIds:
-          summary: Example of multiple discipline IDs
-          value: [1, 5, 7]   # ?ids=1,5,7
-    start_date:
-      in: query
-      name: start_date
-      description: Return only courses created after the given date.
-      example: 2016-10-28
-      schema:
-        type: string
-        format: date
-    end_date:
-      in: query
-      name: end_date
-      description: >
-        Return only courses updated before the given date plus 
-        the expiration period. 
-        Setting both, start_date and end_date, to the same date, 
-        will get you the set of actively 
-        maintained course entries at that date. 
-      example: 2017-10-28
-      schema:
-        type: string
-        format: date
-    sort:
-      in: query
-      name: sort
-      description: >
-        For the index action, the order of the resulting data can be 
-        modified using the sort parameter. 
-        One has to provide at least a valid field name. The sort direction  
-        is optionally appended and separated by a colon. 
-        Default sort direction is ascending, 'ASC'. 
-        The field name should be preceeded by the CamelCased plural table name,
-        separated with a period. 
-        If omitted, table 'Courses' will be assumed as default. 
-        Invalid field names or from tables not included in the result set
-        will be ignored. 
-      example: 
-        oneSorter: ['Countries.name:ASC']
-        multipleSorter: ['Countries.name:ASC','Cities.name:DESC','name']
-      schema:
-        type: array
-        items: 
-          type: string
-  
-  responses:
-    DefaultError:
-      description: Default error schema for any non-200 http codes
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
-            
-    NotFoundError:
-      description: The specified resource could not be found.
-      content: 
-        application/json:
-          schema:
-            properties:
-              code: 
-                type: string
-                example: 404
-              message:
-                type: string
-                example: Record not found in table.
-              url: 
-                type: string
-                example: https://dhcr.api.clarin-dariah.eu/v1/courses/view/4711
-  
   schemas:
     Error:
       properties:
@@ -994,429 +1510,691 @@ components:
           example: An Internal Error Has Occurred.
         url:
           type: string
-          description: Requested URL where the error occurred. 
+          description: Requested URL where the error occurred.
           example: https://dhcr.api.clarin-dariah.eu/v1/courses/view/4711
-    
     Count:
       properties:
         course_count:
           type: integer
-          description: >
+          description: |
             The count of matching courses.
           example: 26
-    
     Course:
       properties:
         id:
           type: integer
-          description: >
-            The unique identifier of this course in the DHCR. 
-            If a new course is submitted, a new ID will be generated automatically.
+          description: |
+            The unique identifier of this course in the DHCR.  If a new course is submitted, a new ID will be generated automatically.
           example: 478
         name:
           type: string
-          description: >
+          description: |
             The main title of this course.
           example: Digital Landscaping of Analogue Literature
         description:
           type: string
-          description: >
+          description: |
             A short text describing the context, intent and audience of the course.
-          example: "The planning and performance of digitization projects and the realization 
-            of sustainable indexing and preservation concepts require knowledge 
-            about future-oriented archiving, efficient presentation and commercial 
-            use of different disciplines..."
+          example: The planning and performance of digitization projects and the realization of sustainable indexing and preservation concepts require knowledge about future-oriented archiving, efficient presentation and commercial use of different disciplines...
         department:
           type: string
-          description: >
-            The department, which organizes the course. 
-            We do not maintain a list of departments, thus this is a free text field.
+          description: |
+            The department, which organizes the course.  We do not maintain a list of departments, thus this is a free text field.
           example: Department for Literature Cartography
         access_requirements:
           type: string
-          description: >
-            A description of the premised graduation or other conditions 
-            to enroll for this course or programme.
-          example: "Completed degree (BA or higher) or 2 years of study in the field 
-            or professional experience."
+          description: |
+            A description of the premised graduation or other conditions  to enroll for this course or programme.
+          example: Completed degree (BA or higher) or 2 years of study in the field or professional experience.
         ects:
           type: number
-          description: >
-            The number of European Credit Transfer System points that can be earned by 
-            succeeding the programme. 
-            You may enter fractions as a float, if required.
+          description: |
+            The number of European Credit Transfer System points that can be earned by  succeeding the programme.  You may enter fractions as a float, if required.
           example: 0.5
         contact_name:
           type: string
-          description: >
+          description: |
             The lecturer name.
           example: Noam Chomsky
         contact_mail:
           type: string
-          format: email
-          description: >
+          description: |
             The lecturer's email contact.
+          format: email
           example: chomsky@mit.edu
         info_url:
           type: string
-          format: url
-          description: >
+          description: |
             The URL of an informative website about the course or programme.
+          format: url
           example: https://www.epfl.ch/schools/cdh/education-2/dh-master/
         guide_url:
           type: string
+          description: |
+            Optional URL of a curriculum guidebook or similar.  Deprecated in 2019, as often confused with info_url.
           format: url
-          deprecated: true
-          description: >
-              Optional URL of a curriculum guidebook or similar. 
-              Deprecated in 2019, as often confused with info_url.
           example: https://www.epfl.ch/schools/cdh/education-2/dh-master/dh-master-study-plan/
+          deprecated: true
         start_date:
           type: string
-          description: >
-            Free text field for the start date. 
-            We recommend YYYY-MM-DD dates. 
-            Multiple dates are separated by "," and should contain 
-            at least the abbreviated month name for best readability, 
-            if no year is given.
+          description: |
+            Free text field for the start date.  We recommend YYYY-MM-DD dates.  Multiple dates are separated by "," and should contain  at least the abbreviated month name for best readability,  if no year is given.
           example: 2019-10-15 || October-15, April-15
         duration:
           type: integer
-          description: >
-            Duration of the programma or course in the provided unit. 
+          description: "Duration of the programma or course in the provided unit. \n"
           example: 365
         course_duration_unit_id:
           type: integer
-          description: >
+          description: |
             ID of the duration unit entry.
           example: 1
         course_duration_unit:
-          $ref: "#/components/schemas/CourseDurationUnit"
-        recurring: 
+          $ref: '#/components/schemas/CourseDurationUnit'
+        recurring:
           type: boolean
-          description: >
-            If the course is held at regular intervals, 
-            this attribute's boolean value is TRUE.
+          description: |
+            If the course is held at regular intervals,  this attribute's boolean value is TRUE.
           example: true
         course_type_id:
           type: integer
-          description: >
-            The course has one type out of six possible values, 
-            which are divided into sub-types of full education programmas 
-            or solitairy courses or summerschools etc. 
-            This fields holds the numeric foreign key of that type. 
+          description: "The course has one type out of six possible values,  which are divided into sub-types of full education programmas  or solitairy courses or summerschools etc.  This fields holds the numeric foreign key of that type. \n"
           example: 3
         course_parent_type_id:
           type: integer
-          description: >
-            There are two possible parent types, either full education programmas
-            or solitary courses or summerschools.
-            This field holds the numeric foreign key of the parent course type.
-            If this field is present on update, it will be ignored. 
-            Its value becomes determined by mapping the course_type_id to a parent_type_id.
+          description: |
+            There are two possible parent types, either full education programmas or solitary courses or summerschools. This field holds the numeric foreign key of the parent course type. If this field is present on update, it will be ignored.  Its value becomes determined by mapping the course_type_id to a parent_type_id.
           example: 1
-        online: 
+        online:
           type: boolean
-          description: >
-            This flag is meant to be set for courses that are available and can 
-            be studied online solely. 
+          description: "This flag is meant to be set for courses that are available and can  be studied online solely. \n"
           example: false
         language_id:
           type: integer
-          description: >
-            This field holds the numeric foreign key of the language, 
-            the course usually will be held in. 
+          description: "This field holds the numeric foreign key of the language,  the course usually will be held in. \n"
           example: 8
         institution_id:
           type: integer
-          description: >
-            This field holds the numeric foreign key of the university, 
-            institution or organisation, that is offering the training. 
+          description: "This field holds the numeric foreign key of the university,  institution or organisation, that is offering the training. \n"
           example: 4
-        city_id: 
+        city_id:
           type: integer
-          description: >
-            This field holds the numeric foreign key of the city, 
-            where the involved institution is located.
+          description: |
+            This field holds the numeric foreign key of the city,  where the involved institution is located.
           example: 17
         country_id:
           type: integer
-          description: >
-            This field holds the numeric foreign key of the country, 
-            where the involved institution is located.
+          description: |
+            This field holds the numeric foreign key of the country,  where the involved institution is located.
           example: 5
         approved:
           type: boolean
-          description: >
-            We have each new metadata set revisited by a moderator 
-            to improve the quality and consistency of our data in 
-            the sense of completeness and relevance to the field 
-            of digital humanities. A plain programming course without 
-            any reference to the arts or humanities for instance, is not.
-            This value will be set TRUE, if a moderator has revised the 
-            given information.
+          description: |
+            We have each new metadata set revisited by a moderator  to improve the quality and consistency of our data in  the sense of completeness and relevance to the field  of digital humanities. A plain programming course without  any reference to the arts or humanities for instance, is not. This value will be set TRUE, if a moderator has revised the  given information.
           example: true
         lon:
           type: number
+          description: |
+            The longitude coordinate of the course location.  Both coordinates will be inherited from the institution,  if no other value is provided.  The database will only store six digits after the decimal point.
           format: float
-          description: >
-            The longitude coordinate of the course location. 
-            Both coordinates will be inherited from the institution, 
-            if no other value is provided. 
-            The database will only store six digits after the decimal point.
           example: 6.287982
         lat:
           type: number
+          description: |
+            The latitude coordinate of the course location.  Both coordinates will be inherited from the institution,  if no other value is provided.  The database will only store six digits after the decimal point.
           format: float
-          description: >
-            The latitude coordinate of the course location. 
-            Both coordinates will be inherited from the institution, 
-            if no other value is provided. 
-            The database will only store six digits after the decimal point.
           example: 45.835102
-        created: 
+        created:
           type: string
-          format: date-time
-          description: >
+          description: |
             On creation of the data set, this time stamp will be set.
-          example: "2019-05-12T20:53:38+00:00"
-        updated: 
-          type: string
           format: date-time
-          description: >
-            On update (or creation) of a data set, 
-            this field indicates the modification date and time. 
-            We use this value to determine the expiry date of each record.
-          example: "2019-05-14T10:14:56+00:00"
+          example: 2019-05-12T20:53:38Z
+        updated:
+          type: string
+          description: |
+            On update (or creation) of a data set,  this field indicates the modification date and time.  We use this value to determine the expiry date of each record.
+          format: date-time
+          example: 2019-05-14T10:14:56Z
         deletion_reason_id:
           type: integer
-          description: > 
-            Identifier of the deletion reason, if the course has been marked as deleted.
-            NULL, if not deleted
+          description: |
+            Identifier of the deletion reason, if the course has been marked as deleted. NULL, if not deleted
           example: 5
         deletion_reason:
-          $ref: "#/components/schemas/DeletionReason"
+          $ref: '#/components/schemas/DeletionReason'
         city:
-          $ref: "#/components/schemas/City"
-        country: 
-          $ref: "#/components/schemas/Country"
+          $ref: '#/components/schemas/City'
+        country:
+          $ref: '#/components/schemas/Country'
         institution:
-          $ref: "#/components/schemas/Institution"
+          $ref: '#/components/schemas/Institution'
         course_type:
-          $ref: "#/components/schemas/CourseType"
+          $ref: '#/components/schemas/CourseType'
         course_parent_type:
-          $ref: "#/components/schemas/CourseParentType"
-        language: 
-          $ref: "#/components/schemas/Language"
+          $ref: '#/components/schemas/CourseParentType'
+        language:
+          $ref: '#/components/schemas/Language'
         discipline:
           type: array
-          items: 
-            $ref: "#/components/schemas/Discipline"
+          items:
+            $ref: '#/components/schemas/Discipline'
         tadirah_object:
           type: array
           items:
-            $ref: "#/components/schemas/TadirahObject"
+            $ref: '#/components/schemas/TadirahObject'
         tadirah_technique:
           type: array
-          items: 
-            $ref: "#/components/schemas/TadirahTechnique"
-    
+          items:
+            $ref: '#/components/schemas/TadirahTechnique'
     City:
       required:
-        - id
-        - country_id
-        - name
-      properties: 
+      - country_id
+      - id
+      - name
+      properties:
         id:
           type: integer
-          description: >
+          description: |
             The unique identifier of this city in the DHCR.
           example: 15
         country_id:
           type: integer
-          description: >
+          description: |
             Foreignkey of the country.
           example: 3
         name:
           type: string
-          description: >
+          description: |
             The city name
           example: Bielefeld
-    
     Country:
-      required: 
-        - id
-        - name
-      properties: 
+      required:
+      - id
+      - name
+      properties:
         id:
           type: integer
-          description: >
+          description: |
             The unique identifier of this country in the DHCR.
           example: 1
         name:
           type: string
-          description: >
+          description: |
             The country name
           example: Netherlands
-          
     CourseDurationUnit:
-      required: 
-        - id
-        - name
+      required:
+      - id
+      - name
       properties:
         id:
           type: integer
-          description: >
+          description: |
             The unique identifier of this duration unit in the DHCR.
           example: 1
-        name: 
+        name:
           type: string
-          description: >
+          description: |
             The unit name
           example: days
-    
     CourseType:
-      description: >
-        Courses belong to one course type. 
-        All types belong to one of two parent types, 
-        either a degree programma or credits. 
-        Thus, there are BA, MA or PhD programmas for the degree parent type
-        and courses, minors and summer schools for credits. 
       required:
-        - id
-        - course_parent_type_id
-        - name
+      - course_parent_type_id
+      - id
+      - name
       properties:
         id:
           type: integer
-          description: >
-            The unique identifier of the course type. 
+          description: "The unique identifier of the course type. \n"
           example: 1
         course_parent_type_id:
           type: integer
-          description: >
-            The foreign key of the parent type, either degree or minor. 
+          description: "The foreign key of the parent type, either degree or minor. \n"
           example: 1
         name:
           type: string
-          description: >
+          description: |
             The type name.
           example: Bachelor Programme
-          
+      description: "Courses belong to one course type.  All types belong to one of two parent types,  either a degree programma or credits.  Thus, there are BA, MA or PhD programmas for the degree parent type and courses, minors and summer schools for credits. \n"
     CourseParentType:
-      description: >
-        Courses belong to one parent course type, 
-        either a degree programma or credits. 
-        All parent types fall into several subtypes, 
-        but for easier data analysis we also maintain this attribute.
       properties:
         id:
           type: integer
-          description: >
-            The unique identifier of the parent course type. 
+          description: "The unique identifier of the parent course type. \n"
           example: 1
         name:
           type: string
-          description: >
+          description: |
             The parent type name.
           example: Degree
-          
+      description: |
+        Courses belong to one parent course type,  either a degree programma or credits.  All parent types fall into several subtypes,  but for easier data analysis we also maintain this attribute.
     DeletionReason:
-      required: 
-        - id
-        - name
-      properties: 
+      required:
+      - id
+      - name
+      properties:
         id:
           type: integer
-          description: >
+          description: |
             The unique identifier of this reason in the DHCR.
           example: 1
         name:
           type: string
-          description: >
+          description: |
             The descriptive name
           example: expired
-          
     Institution:
-      description: >
-        In the DHCR, we keep record of universities, 
-        institutions or organisations involved into 
-        DH teaching in the institutions table. 
-        Not to be confused with departments (affiliation of institution).
       properties:
         id:
           type: integer
-          description: >
-            The unique identifier of the institution in the DHCR. 
+          description: "The unique identifier of the institution in the DHCR. \n"
           example: 19
-        city_id: 
+        city_id:
           type: integer
-          description: >
+          description: |
             Foreign key of the city.
           example: 20
         country_id:
           type: integer
-          description: >
+          description: |
             Foreign key of the country.
           example: 3
-        name: 
+        name:
           type: string
-          description: >
+          description: |
             The name of the institution, preferrably in English language.
           example: University of Cologne
-          
+      description: |
+        In the DHCR, we keep record of universities,  institutions or organisations involved into  DH teaching in the institutions table.  Not to be confused with departments (affiliation of institution).
     Language:
-      description: >
-        The language the course will be held in.
       properties:
         id:
           type: integer
-          description: >
-            The unique identifier of the language in the DHCR. 
+          description: "The unique identifier of the language in the DHCR. \n"
           example: 5
-        name: 
+        name:
           type: string
-          description: >
+          description: |
             The language name
           example: Italian
-          
+      description: |
+        The language the course will be held in.
     Discipline:
-      description: >
-        The scholar discipline or disciplines the course is related to.
       properties:
         id:
           type: integer
-          description: >
+          description: |
             The unique identifier of the discipline in the DHCR.
           example: 1
         name:
           type: string
-          description: >
+          description: |
             The discipline name.
           example: Arts and Cultural Studies
-          
+      description: |
+        The scholar discipline or disciplines the course is related to.
     TadirahTechnique:
       properties:
         id:
           type: integer
-          description: >
+          description: |
             The unique identifier of a technique in the DHCR
           example: 1
-        name: 
+        name:
           type: string
-          description: >
+          description: |
             The technique name.
           example: Bitstream Preservation
-          
     TadirahObject:
       properties:
         id:
           type: integer
-          description: >
+          description: |
             The unique identifier of an object in the DHCR
           example: 12
-        name: 
+        name:
           type: string
-          description: >
+          description: |
             The object name.
           example: Language
+  responses:
+    DefaultError:
+      description: Default error schema for any non-200 http codes
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    NotFoundError:
+      description: The specified resource could not be found.
+      content:
+        application/json:
+          schema:
+            properties:
+              code:
+                type: string
+                example: 404
+              message:
+                type: string
+                example: Record not found in table.
+              url:
+                type: string
+                example: https://dhcr.api.clarin-dariah.eu/v1/courses/view/4711
+  parameters:
+    course_count:
+      name: course_count
+      in: query
+      description: "Setting this flag will append a count of matching courses to  the resulting data set. \n"
+      required: false
+      allowEmptyValue: true
+      style: form
+      explode: true
+      schema:
+        type: boolean
+        enum:
+        - true
+    sort_count:
+      name: sort_count
+      in: query
+      description: "Setting this flag will sort the result set by matching courses descending. \n"
+      required: false
+      allowEmptyValue: true
+      style: form
+      explode: true
+      schema:
+        type: boolean
+        enum:
+        - true
+    recent:
+      name: recent
+      in: query
+      description: "Setting this parameter will cause the API  to return only recent, actively maintained, published  and non-deleted data as on the DHCR website.  Parameter may be empty, any parameter value will  be evaluated (boolean) TRUE. \n"
+      required: false
+      allowEmptyValue: true
+      style: form
+      explode: true
+      schema:
+        type: boolean
+        enum:
+        - true
+    online:
+      name: online
+      in: query
+      description: "Using this parameter, the registry can be queried for either online courses (true), or on-campus courses (false).  Omitting the parameter or an empty string will result in both types being returned. \n"
+      required: false
+      allowEmptyValue: true
+      style: form
+      explode: true
+      schema:
+        type: boolean
+        enum:
+        - true
+        - false
+    recurring:
+      name: recurring
+      in: query
+      description: "Courses may either be one-off workshops or recurring courses or programmes.  Omitting the parameter or an empty string will result in both types being returned. \n"
+      required: false
+      allowEmptyValue: true
+      style: form
+      explode: true
+      schema:
+        type: boolean
+        enum:
+        - true
+        - false
+    group:
+      name: group
+      in: query
+      description: "Setting this parameter will change the structure of returned  data for cities and institutions.  The result is turned into an object grouping entries by country names as the object properties.  Parameter may be empty, any parameter value will  be evaluated (boolean) TRUE. \n"
+      required: false
+      allowEmptyValue: true
+      style: form
+      explode: true
+      schema:
+        type: boolean
+        enum:
+        - true
+    city_id:
+      name: city_id
+      in: query
+      description: One or more city IDs, separated by comma.
+      required: false
+      style: form
+      explode: false
+      schema:
+        type: array
+        items:
+          type: integer
+      examples:
+        oneId:
+          summary: Example of a single city ID
+          value:
+          - 5
+        multipleIds:
+          summary: Example of multiple city IDs
+          value:
+          - 1
+          - 5
+          - 7
+    country_id:
+      name: country_id
+      in: query
+      description: One or more country IDs, separated by comma.
+      required: false
+      style: form
+      explode: false
+      schema:
+        type: array
+        items:
+          type: integer
+      examples:
+        oneId:
+          summary: Example of a single country ID
+          value:
+          - 3
+        multipleIds:
+          summary: Example of multiple country IDs
+          value:
+          - 1
+          - 5
+          - 7
+    institution_id:
+      name: institution_id
+      in: query
+      description: One or more institution IDs, separated by comma.
+      required: false
+      style: form
+      explode: false
+      schema:
+        type: array
+        items:
+          type: integer
+      examples:
+        oneId:
+          summary: Example of a single institution ID
+          value:
+          - 20
+        multipleIds:
+          summary: Example of multiple institution IDs
+          value:
+          - 20
+          - 5
+          - 7
+    language_id:
+      name: language_id
+      in: query
+      description: One or more language IDs, separated by comma.
+      required: false
+      style: form
+      explode: false
+      schema:
+        type: array
+        items:
+          type: integer
+      examples:
+        oneId:
+          summary: Example of a single language ID
+          value:
+          - 8
+        multipleIds:
+          summary: Example of multiple language IDs
+          value:
+          - 1
+          - 5
+          - 8
+    course_type_id:
+      name: course_type_id
+      in: query
+      description: One or more course type IDs, separated by comma.
+      required: false
+      style: form
+      explode: false
+      schema:
+        type: array
+        items:
+          type: integer
+      examples:
+        oneId:
+          summary: Example of a single course type ID
+          value:
+          - 5
+        multipleIds:
+          summary: Example of multiple course type IDs
+          value:
+          - 1
+          - 5
+          - 6
+    course_parent_type_id:
+      name: course_parent_type_id
+      in: query
+      description: One or more course parent type IDs, separated by comma.
+      required: false
+      style: form
+      explode: false
+      schema:
+        type: array
+        items:
+          type: integer
+      examples:
+        oneId:
+          summary: Example of a single course parent type ID
+          value:
+          - 2
+        multipleIds:
+          summary: Example of multiple course parent type IDs
+          value:
+          - 2
+          - 1
+    tadirah_object_id:
+      name: tadirah_object_id
+      in: query
+      description: One or more IDs of TaDiRAH objects, separated by comma.
+      required: false
+      style: form
+      explode: false
+      schema:
+        type: array
+        items:
+          type: integer
+      examples:
+        oneId:
+          summary: Example of a single object ID
+          value:
+          - 5
+        multipleIds:
+          summary: Example of multiple object IDs
+          value:
+          - 1
+          - 5
+          - 7
+    tadirah_technique_id:
+      name: tadirah_technique_id
+      in: query
+      description: One or more IDs of TaDiRAH techniques, separated by comma.
+      required: false
+      style: form
+      explode: false
+      schema:
+        type: array
+        items:
+          type: integer
+      examples:
+        oneId:
+          summary: Example of a single technique ID
+          value:
+          - 5
+        multipleIds:
+          summary: Example of multiple technique IDs
+          value:
+          - 1
+          - 5
+          - 7
+    discipline_id:
+      name: discipline_id
+      in: query
+      description: One or more discipline IDs, separated by comma.
+      required: false
+      style: form
+      explode: false
+      schema:
+        type: array
+        items:
+          type: integer
+      examples:
+        oneId:
+          summary: Example of a single discipline ID
+          value:
+          - 5
+        multipleIds:
+          summary: Example of multiple discipline IDs
+          value:
+          - 1
+          - 5
+          - 7
+    start_date:
+      name: start_date
+      in: query
+      description: Return only courses created after the given date.
+      required: false
+      style: form
+      explode: true
+      schema:
+        type: string
+        format: date
+      example: 2016-10-28
+    end_date:
+      name: end_date
+      in: query
+      description: "Return only courses updated before the given date plus  the expiration period.  Setting both, start_date and end_date, to the same date,  will get you the set of actively  maintained course entries at that date. \n"
+      required: false
+      style: form
+      explode: true
+      schema:
+        type: string
+        format: date
+      example: 2017-10-28
+    sort:
+      name: sort
+      in: query
+      description: "For the index action, the order of the resulting data can be  modified using the sort parameter.  One has to provide at least a valid field name. The sort direction   is optionally appended and separated by a colon.  Default sort direction is ascending, 'ASC'.  The field name should be preceeded by the CamelCased plural table name, separated with a period.  If omitted, table 'Courses' will be assumed as default.  Invalid field names or from tables not included in the result set will be ignored.  Multiple sorters can be passed separated by comma, in the intended order of evaluation. \n"
+      required: false
+      style: form
+      explode: true
+      schema:
+        type: array
+        items:
+          type: string
+      example:
+        oneSorter:
+          summary: One sort directive
+          value:
+          - Countries.name:ASC
+        multipleSorter:
+          summary: Multiple sort directives
+          value:
+          - Countries.name:ASC
+          - Cities.name:DESC
+          - name
