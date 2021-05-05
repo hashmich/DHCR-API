@@ -174,6 +174,7 @@ return [
         'skipLog' => [],
         'log' => true,
         'trace' => true,
+        'extraFatalErrorMemory' => 2
     ],
 
     /**
