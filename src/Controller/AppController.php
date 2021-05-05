@@ -39,17 +39,17 @@ class AppController extends Controller
      *
      * @return void
      */
-    public function initialize() {
+    public function initialize(): void {
         parent::initialize();
 
         $this->loadComponent('RequestHandler', [
             'enableBeforeRedirect' => false,
         ]);
         $this->response = $this->response->withHeader('Access-Control-Allow-Origin', '*');
-    
+
         // Set the Cache-Control as public for 3600 seconds
         $this->response = $this->response->withSharable(true, 3600);
-        
+
         //$this->loadComponent('Flash');
 
         /*
@@ -59,13 +59,13 @@ class AppController extends Controller
         //$this->loadComponent('Security');
     }
     
-    public function beforeFilter(Event $event) {
+    public function beforeFilter(\Cake\Event\EventInterface $event) {
 		
     	
     	return parent::beforeFilter($event);
 	}
 	
-	public function beforeRender(Event $event) {
+	public function beforeRender(\Cake\Event\EventInterface $event) {
 		parent::beforeRender($event);
 		$this->viewBuilder()->setClassName('Json');
 	}

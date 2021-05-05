@@ -31,7 +31,7 @@ class PagesController extends AppController
 {
 	
 	
-	public function beforeRender(Event $event) {
+	public function beforeRender(\Cake\Event\EventInterface $event) {
 		// bypass forcing data views for this controller only, make no call to parent::beforeRender()
 	}
 	
